@@ -8,9 +8,10 @@ import javax.persistence.EntityManager;
 
 /**
  *
- * @author theo
+ * @author sotos
  */
 public class DBManager {
     public static final EntityManager em = 
             javax.persistence.Persistence.createEntityManagerFactory("RadioStationPU").createEntityManager();
+
 }

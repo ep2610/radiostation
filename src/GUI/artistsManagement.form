@@ -2,34 +2,11 @@
 
 <Form version="1.6" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
   <NonVisualComponents>
-    <Component class="javax.persistence.EntityManager" name="RadioStationPUEntityManager0">
-      <Properties>
-        <Property name="persistenceUnit" type="java.lang.String" value="RadioStationPU"/>
-      </Properties>
-    </Component>
-    <Component class="javax.persistence.Query" name="albumQuery">
-      <Properties>
-        <Property name="query" type="java.lang.String" value="SELECT a FROM Album a"/>
-        <Property name="entityManager" type="java.lang.Object" editor="org.netbeans.modules.form.j2ee.J2EEPropertyModifier$EMProperty$EntityManagerEditor">
-          <ComponentRef name="RadioStationPUEntityManager0"/>
-        </Property>
-      </Properties>
-    </Component>
-    <Component class="java.util.List" name="albumList">
-      <Properties>
-        <Property name="query" type="java.lang.Object" editor="org.netbeans.modules.form.j2ee.J2EEPropertyModifier$QueryBeanProperty$QueryEditor">
-          <ComponentRef name="albumQuery"/>
-        </Property>
-      </Properties>
-      <AuxValues>
-        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;model.Album&gt;"/>
-      </AuxValues>
-    </Component>
     <Component class="javax.persistence.Query" name="artistQuery">
       <Properties>
         <Property name="query" type="java.lang.String" value="SELECT a FROM Artist a"/>
-        <Property name="entityManager" type="java.lang.Object" editor="org.netbeans.modules.form.j2ee.J2EEPropertyModifier$EMProperty$EntityManagerEditor">
-          <ComponentRef name="RadioStationPUEntityManager0"/>
+        <Property name="entityManager" type="java.lang.Object" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="em" type="code"/>
         </Property>
       </Properties>
     </Component>
@@ -38,6 +15,7 @@
         <Property name="query" type="java.lang.Object" editor="org.netbeans.modules.form.j2ee.J2EEPropertyModifier$QueryBeanProperty$QueryEditor">
           <ComponentRef name="artistQuery"/>
         </Property>
+        <Property name="observable" type="boolean" value="true"/>
       </Properties>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;model.Artist&gt;"/>
@@ -238,6 +216,9 @@
               </Subbinding>
             </BindingProperty>
           </BindingProperties>
+          <Events>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jTable1MouseClicked"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

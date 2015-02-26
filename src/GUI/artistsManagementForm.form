@@ -1,10 +1,28 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<Form version="1.3" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
+<Form version="1.5" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
   <NonVisualComponents>
-    <Component class="javax.persistence.EntityManager" name="entityManager1">
+    <Component class="javax.persistence.Query" name="musicgenreQuery">
       <Properties>
-        <Property name="persistenceUnit" type="java.lang.String" value="pu"/>
+        <Property name="query" type="java.lang.String" value="SELECT m FROM Musicgenre m"/>
+        <Property name="entityManager" type="java.lang.Object" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="em" type="code"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="java.util.List" name="musicgenreList">
+      <Properties>
+        <Property name="query" type="java.lang.Object" editor="org.netbeans.modules.form.j2ee.J2EEPropertyModifier$QueryBeanProperty$QueryEditor">
+          <ComponentRef name="musicgenreQuery"/>
+        </Property>
+      </Properties>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;model.Musicgenre&gt;"/>
+      </AuxValues>
+    </Component>
+    <Component class="GUI.musicGenreRenderer" name="musicGenreRenderer1">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="musicGenreRenderer1"/>
       </Properties>
     </Component>
   </NonVisualComponents>
@@ -60,11 +78,11 @@
                           <Group type="103" groupAlignment="0" max="-2" attributes="0">
                               <Component id="jTextField2" linkSize="1" alignment="0" pref="90" max="32767" attributes="0"/>
                               <Component id="jTextField3" linkSize="1" alignment="0" pref="90" max="32767" attributes="0"/>
-                              <Component id="jTextField4" linkSize="1" alignment="0" pref="90" max="32767" attributes="0"/>
-                              <Component id="jTextField5" linkSize="1" alignment="0" pref="92" max="32767" attributes="0"/>
                               <Component id="jTextField6" linkSize="1" alignment="0" pref="90" max="32767" attributes="0"/>
-                              <Component id="jTextField7" linkSize="1" alignment="0" pref="87" max="32767" attributes="0"/>
-                              <Component id="jTextField1" alignment="0" max="32767" attributes="0"/>
+                              <Component id="jTextField1" linkSize="1" alignment="0" max="32767" attributes="0"/>
+                              <Component id="jComboBox1" linkSize="1" alignment="0" max="32767" attributes="0"/>
+                              <Component id="jComboBox2" linkSize="1" alignment="0" max="32767" attributes="0"/>
+                              <Component id="jDateChooser1" linkSize="1" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
                   </Group>
@@ -96,12 +114,12 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jLabel5" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jTextField4" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jComboBox1" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="jLabel6" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jTextField5" alignment="3" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="1" attributes="0">
+                  <Component id="jLabel6" min="-2" max="-2" attributes="0"/>
+                  <Component id="jDateChooser1" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -111,7 +129,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jLabel8" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jTextField7" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jComboBox2" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -176,13 +194,7 @@
     </Component>
     <Component class="javax.swing.JTextField" name="jTextField3">
     </Component>
-    <Component class="javax.swing.JTextField" name="jTextField4">
-    </Component>
-    <Component class="javax.swing.JTextField" name="jTextField5">
-    </Component>
     <Component class="javax.swing.JTextField" name="jTextField6">
-    </Component>
-    <Component class="javax.swing.JTextField" name="jTextField7">
     </Component>
     <Component class="javax.swing.JButton" name="jButton1">
       <Properties>
@@ -196,6 +208,31 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="&#x391;&#x3c0;&#x3bf;&#x3b8;&#x3ae;&#x3ba;&#x3b5;&#x3c5;&#x3c3;&#x3b7;"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton2ActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JComboBox" name="jComboBox1">
+      <Properties>
+        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+          <StringArray count="2">
+            <StringItem index="0" value="Male"/>
+            <StringItem index="1" value="Female"/>
+          </StringArray>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JComboBox" name="jComboBox2">
+      <Properties>
+        <Property name="renderer" type="javax.swing.ListCellRenderer" editor="org.netbeans.modules.form.ComponentChooserEditor">
+          <ComponentRef name="musicGenreRenderer1"/>
+        </Property>
+      </Properties>
+      <BindingProperties>
+        <BindingProperty name="elements" source="musicgenreList" target="jComboBox2" targetPath="elements" updateStrategy="0" immediately="false"/>
+      </BindingProperties>
+    </Component>
+    <Component class="com.toedter.calendar.JDateChooser" name="jDateChooser1">
     </Component>
   </SubComponents>
 </Form>

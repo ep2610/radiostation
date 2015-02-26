@@ -5,21 +5,33 @@
  */
 package GUI;
 
+import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import javax.swing.JOptionPane;
+import javax.persistence.EntityManager;
+import javax.swing.JFrame;
 import model.Artist;
+import model.DBManager;
 
 /**
  *
  * @author sotos
  */
 public class artistsManagement extends javax.swing.JFrame {
-
+    private EntityManager em;
+    Artist a;
+    int s;
+    
     /**
      * Creates new form artistsManagement
      */
     public artistsManagement() {
+        em = DBManager.em;
+        if (!em.getTransaction().isActive()) {
+            em.getTransaction().begin();
+        }
+        
         initComponents();
+        checkControls();
         // Αλλαγή του τρόπου που κλέινει το παράθυρο με το x
         super.addWindowListener(new java.awt.event.WindowAdapter(){
             @Override
@@ -27,6 +39,13 @@ public class artistsManagement extends javax.swing.JFrame {
             new mainGUI().setVisible(true);
         }
         });
+    }
+    
+    // Ενεργοποιεί κατάλληλα τα κουμπιά διαγραφής και επεξεργασίας
+    private void checkControls() {
+        s = jTable1.getSelectedRow();
+        jButton2.setEnabled(s >= 0);
+        jButton3.setEnabled(s >= 0);
     }
     
     /**
@@ -39,11 +58,8 @@ public class artistsManagement extends javax.swing.JFrame {
     private void initComponents() {
         bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
-        RadioStationPUEntityManager0 = java.beans.Beans.isDesignTime() ? null : javax.persistence.Persistence.createEntityManagerFactory("RadioStationPU").createEntityManager();
-        albumQuery = java.beans.Beans.isDesignTime() ? null : RadioStationPUEntityManager0.createQuery("SELECT a FROM Album a");
-        albumList = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : albumQuery.getResultList();
-        artistQuery = java.beans.Beans.isDesignTime() ? null : RadioStationPUEntityManager0.createQuery("SELECT a FROM Artist a");
-        artistList = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : artistQuery.getResultList();
+        artistQuery = java.beans.Beans.isDesignTime() ? null : em.createQuery("SELECT a FROM Artist a");
+        artistList = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : org.jdesktop.observablecollections.ObservableCollections.observableList(artistQuery.getResultList());
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
@@ -111,6 +127,11 @@ public class artistsManagement extends javax.swing.JFrame {
         columnBinding.setEditable(false);
         bindingGroup.addBinding(jTableBinding);
         jTableBinding.bind();
+        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable1MouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(jTable1);
         if (jTable1.getColumnModel().getColumnCount() > 0) {
             jTable1.getColumnModel().getColumn(0).setPreferredWidth(40);
@@ -171,43 +192,92 @@ public class artistsManagement extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        Artist a = new Artist();
-        RadioStationPUEntityManager0.persist(a);
+        a = new Artist();
+        //a.setArtistId(new Long(artistList.size()+1));
+        a.setLastname("Last");
+        a.setFirstname("First");
+        a.setArtisticname("");
+        a.setSex("");
+        a.setBirthday(null);
+        a.setBirthplace("");
+        a.setMusicgenregenreId(null);
+
         artistsManagementForm amf = new artistsManagementForm(a);
+        
         amf.setVisible(true);
-        artistsManagement thisframe = this;
+        //artistsManagement thisframe = this;
+        JFrame thisframe = this;
         thisframe.setEnabled(false);
-        /*
-        amf.addWindowListener(new WindowListener(){
-            public void windowClosed(WindowEvent arg0){
-                if(((MyWindowEvent)arg0).exitAndSave){
-                    artistList.add(a);
-                    int row = artistList.size() - 1;
-                    jTable1.setRowSelectionInterval(row, row);
-                    jTable1.scrollRectToVisible(jTable1.getCellRect(row, 0, true));
-                    thisFrame.setEnabled(true);
+        
+        amf.addWindowListener(new WindowListener() {
+            @Override
+            public void windowClosed(WindowEvent arg0) {
+                if (((MyWindowEvent) arg0).exitAndSave) {                     
+                    //System.out.println("a.Firstname: "+a.getFirstname());
+                    //em.persist(a);
+                    //artistList.add(a);
+                    //int row = artistList.size() - 1;
+                    //jTable1.setRowSelectionInterval(row, row);
+                    //jTable1.scrollRectToVisible(jTable1.getCellRect(row, 0, true));
+                    
                 }
-                else{
-                    thisFrame.setEnabled(true);
+                else {
                     em.getTransaction().rollback();
-                    em.getTransaction().begin();
-                    java.util.Collection data = artistQuery.getResultList();
-                    for (Object entity : data) {
-                        em.refresh(entity);
-                    }
-                    artistList.clear();
-                    artistList.addAll(data);
+                    em.getTransaction().begin();                  
                 }
+                java.util.Collection data = artistQuery.getResultList();
+                for (Object entity : data) {
+                    em.refresh(entity);
+                }
+                artistList.clear();
+                artistList.addAll(data);
+                
+                thisframe.setEnabled(true);
+                checkControls();
             }
-        });
-        */
+
+            @Override
+            public void windowOpened(WindowEvent e) {
+                System.out.println("Window Opened");
+            }
+
+            @Override
+            public void windowClosing(WindowEvent e) {
+                System.out.println("Window Closing");
+            }
+
+            @Override
+            public void windowIconified(WindowEvent e) {
+                System.out.println("Window Iconified");
+            }
+
+            @Override
+            public void windowDeiconified(WindowEvent e) {
+                System.out.println("Window Deiconified");
+            }
+
+            @Override
+            public void windowActivated(WindowEvent e) {
+                System.out.println("Window Activated");
+            }
+
+            @Override
+            public void windowDeactivated(WindowEvent e) {
+                System.out.println("Window Deactivated");
+            }
+        }
+        );
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
+        checkControls();
+        if (jButton3.isEnabled() && (evt.getClickCount() > 1)) {
+            //jButton2ActionPerformed(null);
+        }
+    }//GEN-LAST:event_jTable1MouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.persistence.EntityManager RadioStationPUEntityManager0;
-    private java.util.List<model.Album> albumList;
-    private javax.persistence.Query albumQuery;
     private java.util.List<model.Artist> artistList;
     private javax.persistence.Query artistQuery;
     private javax.swing.JButton jButton1;

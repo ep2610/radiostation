@@ -5,30 +5,37 @@
  */
 package GUI;
 
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import javax.persistence.EntityManager;
 import model.Artist;
+import model.DBManager;
+import model.Musicgenre;
+
 
 /**
  *
  * @author sotos
  */
 public class artistsManagementForm extends javax.swing.JFrame {
-
+    private EntityManager em;
+    Artist artist1;
     /**
      * Creates new form artistsManagementForm
      */
     public artistsManagementForm(Artist a) {
+        em = DBManager.em;
+        artist1 = a;
+        System.out.println("Firstname: " + artist1.getFirstname() + ", Lastname: " + artist1.getLastname());
         initComponents();
+        
         // Αλλαγή του τρόπου που κλέινει το παράθυρο με το x
         super.addWindowListener(new java.awt.event.WindowAdapter(){
             @Override
             public void windowClosing(java.awt.event.WindowEvent windowEvent) {
             new mainGUI().setVisible(true);
-        }
+            }
         });
-        Artist artist1 = a;
-        if(!(entityManager1.getTransaction().isActive())){
-            entityManager1.getTransaction().begin();
-        }
     }
 
     /**
@@ -39,8 +46,11 @@ public class artistsManagementForm extends javax.swing.JFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
-        entityManager1 = java.beans.Beans.isDesignTime() ? null : javax.persistence.Persistence.createEntityManagerFactory("RadioStationPU").createEntityManager();
+        musicgenreQuery = java.beans.Beans.isDesignTime() ? null : em.createQuery("SELECT m FROM Musicgenre m");
+        musicgenreList = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : musicgenreQuery.getResultList();
+        musicGenreRenderer1 = new GUI.musicGenreRenderer();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -52,12 +62,14 @@ public class artistsManagementForm extends javax.swing.JFrame {
         jTextField1 = new javax.swing.JTextField();
         jTextField2 = new javax.swing.JTextField();
         jTextField3 = new javax.swing.JTextField();
-        jTextField4 = new javax.swing.JTextField();
-        jTextField5 = new javax.swing.JTextField();
         jTextField6 = new javax.swing.JTextField();
-        jTextField7 = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
+        jComboBox1 = new javax.swing.JComboBox();
+        jComboBox2 = new javax.swing.JComboBox();
+        jDateChooser1 = new com.toedter.calendar.JDateChooser();
+
+        musicGenreRenderer1.setText("musicGenreRenderer1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Φόρμα Διαχείρισης Καλλιτέχνη");
@@ -89,6 +101,18 @@ public class artistsManagementForm extends javax.swing.JFrame {
         });
 
         jButton2.setText("Αποθήκευση");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Male", "Female" }));
+
+        jComboBox2.setRenderer(musicGenreRenderer1);
+
+        org.jdesktop.swingbinding.JComboBoxBinding jComboBoxBinding = org.jdesktop.swingbinding.SwingBindings.createJComboBoxBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, musicgenreList, jComboBox2);
+        bindingGroup.addBinding(jComboBoxBinding);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -119,15 +143,15 @@ public class artistsManagementForm extends javax.swing.JFrame {
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                 .addComponent(jTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 90, Short.MAX_VALUE)
                                 .addComponent(jTextField3, javax.swing.GroupLayout.DEFAULT_SIZE, 90, Short.MAX_VALUE)
-                                .addComponent(jTextField4, javax.swing.GroupLayout.DEFAULT_SIZE, 90, Short.MAX_VALUE)
-                                .addComponent(jTextField5, javax.swing.GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE)
                                 .addComponent(jTextField6, javax.swing.GroupLayout.DEFAULT_SIZE, 90, Short.MAX_VALUE)
-                                .addComponent(jTextField7, javax.swing.GroupLayout.DEFAULT_SIZE, 87, Short.MAX_VALUE)
-                                .addComponent(jTextField1)))))
+                                .addComponent(jTextField1)
+                                .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jComboBox2, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jDateChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jTextField2, jTextField3, jTextField4, jTextField5, jTextField6, jTextField7});
+        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jComboBox1, jComboBox2, jDateChooser1, jTextField1, jTextField2, jTextField3, jTextField6});
 
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -149,11 +173,11 @@ public class artistsManagementForm extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
-                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel6)
-                    .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jDateChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel7)
@@ -161,7 +185,7 @@ public class artistsManagementForm extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel8)
-                    .addComponent(jTextField7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton1)
@@ -169,19 +193,54 @@ public class artistsManagementForm extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        bindingGroup.bind();
+
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void closeMe(boolean exitAndSave) {
+        MyWindowEvent we = new MyWindowEvent(this, WindowEvent.WINDOW_CLOSED, exitAndSave);
+        for (WindowListener l : this.getWindowListeners()) {
+            l.windowClosed(we);
+        }
+        this.setVisible(false);
+        //this.dispose();
+    }
+    
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        this.dispose();
+        closeMe(false);
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        Musicgenre m = new Musicgenre();
+        m.setGenreId(new Long(3));
+        m.setName("POP");
+        Artist a = new Artist();
+        a.setLastname(jTextField1.getText());
+        a.setFirstname(jTextField2.getText());
+        a.setArtisticname(jTextField3.getText());
+        a.setSex(jComboBox1.getSelectedItem().toString());
+        //a.setBirthday(jTextField5.getText());
+        a.setBirthday(jDateChooser1.getDate());
+        //a.setBirthday(null);
+        a.setBirthplace(jTextField6.getText());
+        //a.setMusicgenregenreId(m);
+        a.setMusicgenregenreId((Musicgenre) jComboBox2.getSelectedItem());
+        System.out.println("Firstname: " + a.getFirstname() + ", Lastname: " + a.getLastname());
+        em.persist(a);
+        em.getTransaction().commit();
+        em.getTransaction().begin();
+        closeMe(true);
+    }//GEN-LAST:event_jButton2ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.persistence.EntityManager entityManager1;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JComboBox jComboBox1;
+    private javax.swing.JComboBox jComboBox2;
+    private com.toedter.calendar.JDateChooser jDateChooser1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -193,9 +252,10 @@ public class artistsManagementForm extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
     private javax.swing.JTextField jTextField3;
-    private javax.swing.JTextField jTextField4;
-    private javax.swing.JTextField jTextField5;
     private javax.swing.JTextField jTextField6;
-    private javax.swing.JTextField jTextField7;
+    private GUI.musicGenreRenderer musicGenreRenderer1;
+    private java.util.List<model.Musicgenre> musicgenreList;
+    private javax.persistence.Query musicgenreQuery;
+    private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 }

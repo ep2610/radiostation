@@ -11,7 +11,7 @@
     <class>model.AlbumMusicgroup</class>
     <class>model.Playlist</class>
     <properties>
-      <property name="javax.persistence.jdbc.url" value="jdbc:derby://localhost:1527/radiostation_test"/>
+      <property name="javax.persistence.jdbc.url" value="jdbc:derby://localhost:1527/radiostation_andreas"/>
       <property name="javax.persistence.jdbc.user" value="radio"/>
       <property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.ClientDriver"/>
       <property name="javax.persistence.jdbc.password" value="station"/>

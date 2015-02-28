@@ -5,6 +5,7 @@
  */
 package GUI;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -20,6 +21,7 @@ public class artistAlbumsManagement extends javax.swing.JFrame {
     private static EntityManager em;    
     private List<Album> albumList1 = new ArrayList<>();  //καλάθι
     private DefaultTableModel model;
+    SimpleDateFormat sdf= new SimpleDateFormat("EEE, MMM  dd,  yyyy");  //ορίζω το format της ημερομηνίας
 
     /**
      * Creates new form artistAlbumsManagement
@@ -72,7 +74,7 @@ public class artistAlbumsManagement extends javax.swing.JFrame {
             tmpArtistName = t.getLastname() + " " + t.getFirstname();
 
             //Τοποθετεί στον πίνακα τις πληροφορίες των album
-            model.addRow(new Object[]{a.getTitle(),a.getType(),a.getMusicproductioncompanycompanyId().getName(),a.getDisknumber(), tmpArtistName, a.getReleasedate()});
+            model.addRow(new Object[]{a.getTitle(),a.getType(),a.getMusicproductioncompanycompanyId().getName(),a.getDisknumber(), tmpArtistName, sdf.format(a.getReleasedate())});//εδώ απλά εφαρμόζω την μέθοδο format του SimpleDateFormat που δημιούργησα στην αρχή.
         }
      }
     

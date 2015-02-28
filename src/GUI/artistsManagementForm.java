@@ -55,6 +55,7 @@ public class artistsManagementForm extends javax.swing.JFrame {
         musicgenreList = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : musicgenreQuery.getResultList();
         musicGenreRenderer1 = new GUI.musicGenreRenderer();
         artist2 = artist1;
+        entityManager1 = java.beans.Beans.isDesignTime() ? null : javax.persistence.Persistence.createEntityManagerFactory("RadioStationPU").createEntityManager();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -123,11 +124,17 @@ public class artistsManagementForm extends javax.swing.JFrame {
         });
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Male", "Female" }));
-        jComboBox1.setSelectedIndex(0);
-        jComboBox1.setSelectedItem("Male");
+        jComboBox1.setSelectedIndex(-1);
+        jComboBox1.setToolTipText("");
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, artist2, org.jdesktop.beansbinding.ELProperty.create("${sex}"), jComboBox1, org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
         bindingGroup.addBinding(binding);
+
+        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox1ActionPerformed(evt);
+            }
+        });
 
         jComboBox2.setRenderer(musicGenreRenderer1);
 
@@ -238,7 +245,7 @@ public class artistsManagementForm extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         Artist a = new Artist();
-        if (!(jTextField1.getText().isEmpty()) && !(jTextField2.getText().isEmpty())) {
+        if (!(jTextField1.getText().isEmpty()) && !(jTextField2.getText().isEmpty()) && !(jTextField6.getText().isEmpty()) && !(jComboBox1.getSelectedIndex() == -1) &&!(jComboBox2.getSelectedIndex() == -1) && !(jDateChooser1.getDate() == null) ){
             a.setLastname(jTextField1.getText());
             a.setFirstname(jTextField2.getText());
             a.setArtisticname(jTextField3.getText());
@@ -249,13 +256,18 @@ public class artistsManagementForm extends javax.swing.JFrame {
             closeMe(true);
         }
         else {
-            JOptionPane.showMessageDialog(this, "Τα πεδία 'Επώνυμο' και 'Όνομα' δεν μπορούν να είναι κενά.\nΠαρακαλώ διορθώστε ή πατήστε ακύρωση.", "Λάθος στην εισαγωγή", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Όλα τα πεδία (πλην του πεδίου 'Καλλιτεχνικό Όνομα') πρέπει να είναι συμπληρωμένα.\nΠαρακαλώ διορθώστε ή πατήστε ακύρωση.", "Λάθος στην εισαγωγή", JOptionPane.WARNING_MESSAGE);
         }
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jComboBox1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private model.Artist artist2;
+    private javax.persistence.EntityManager entityManager1;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JComboBox jComboBox1;

@@ -9,6 +9,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import javax.persistence.EntityManager;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import model.Artist;
 import model.DBManager;
 
@@ -20,6 +21,7 @@ public class artistsManagement extends javax.swing.JFrame {
     private EntityManager em;
     Artist a;
     int s;
+    JFrame thisframe;
     
     /**
      * Creates new form artistsManagement
@@ -80,8 +82,18 @@ public class artistsManagement extends javax.swing.JFrame {
         });
 
         jButton2.setText("Διαγραφή");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jButton3.setText("Μεταβολή");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         jButton4.setText("Έξοδος");
         jButton4.addActionListener(new java.awt.event.ActionListener() {
@@ -94,6 +106,7 @@ public class artistsManagement extends javax.swing.JFrame {
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/artist_32_32.png"))); // NOI18N
         jLabel1.setText("Καλλιτέχνες");
 
+        jTable1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jTable1.getTableHeader().setReorderingAllowed(false);
 
         org.jdesktop.swingbinding.JTableBinding jTableBinding = org.jdesktop.swingbinding.SwingBindings.createJTableBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, artistList, jTable1);
@@ -193,9 +206,8 @@ public class artistsManagement extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         a = new Artist();
-        //a.setArtistId(new Long(artistList.size()+1));
-        a.setLastname("Last");
-        a.setFirstname("First");
+        a.setLastname("");
+        a.setFirstname("");
         a.setArtisticname("");
         a.setSex("");
         a.setBirthday(null);
@@ -205,33 +217,21 @@ public class artistsManagement extends javax.swing.JFrame {
         artistsManagementForm amf = new artistsManagementForm(a);
         
         amf.setVisible(true);
-        //artistsManagement thisframe = this;
         JFrame thisframe = this;
         thisframe.setEnabled(false);
         
         amf.addWindowListener(new WindowListener() {
             @Override
             public void windowClosed(WindowEvent arg0) {
-                if (((MyWindowEvent) arg0).exitAndSave) {                     
-                    //System.out.println("a.Firstname: "+a.getFirstname());
-                    //em.persist(a);
-                    //artistList.add(a);
-                    //int row = artistList.size() - 1;
-                    //jTable1.setRowSelectionInterval(row, row);
-                    //jTable1.scrollRectToVisible(jTable1.getCellRect(row, 0, true));
-                    
+                if (MyWindowEvent.isExitAndSave(arg0)) {
+                    em.persist(a);
+                    artistList.add(a);
+                    int row = artistList.size() - 1;
+                    jTable1.setRowSelectionInterval(row, row);
+                    jTable1.scrollRectToVisible(jTable1.getCellRect(row, 0, true));
+                    em.getTransaction().commit();
+                    em.getTransaction().begin();
                 }
-                else {
-                    em.getTransaction().rollback();
-                    em.getTransaction().begin();                  
-                }
-                java.util.Collection data = artistQuery.getResultList();
-                for (Object entity : data) {
-                    em.refresh(entity);
-                }
-                artistList.clear();
-                artistList.addAll(data);
-                
                 thisframe.setEnabled(true);
                 checkControls();
             }
@@ -244,6 +244,7 @@ public class artistsManagement extends javax.swing.JFrame {
             @Override
             public void windowClosing(WindowEvent e) {
                 System.out.println("Window Closing");
+                thisframe.setEnabled(true);
             }
 
             @Override
@@ -264,6 +265,7 @@ public class artistsManagement extends javax.swing.JFrame {
             @Override
             public void windowDeactivated(WindowEvent e) {
                 System.out.println("Window Deactivated");
+                thisframe.setEnabled(true);
             }
         }
         );
@@ -271,10 +273,95 @@ public class artistsManagement extends javax.swing.JFrame {
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
         checkControls();
-        if (jButton3.isEnabled() && (evt.getClickCount() > 1)) {
-            //jButton2ActionPerformed(null);
-        }
     }//GEN-LAST:event_jTable1MouseClicked
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        s = jTable1.getSelectedRow();
+        a = artistList.get(s);
+        Object[] options = {"Διαγραφή", "Ακύρωση"};
+        int n = JOptionPane.showOptionDialog(this, "Θέλετε να διαγράψετε τον καλλιτέχνη " + a.getLastname() + " " + a.getFirstname() + ";",
+                "Επιβεβαίωση Διαγραφής",
+                JOptionPane.OK_CANCEL_OPTION, 
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                options[1]);
+        
+        if(n == 0){
+            em.remove(a);
+            artistList.remove(a);
+            em.getTransaction().commit();
+            em.getTransaction().begin();
+            checkControls();
+        }
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        s = jTable1.getSelectedRow();
+        a = artistList.get(s);
+
+        artistsManagementForm amf = new artistsManagementForm(a);
+        
+        amf.setVisible(true);
+        thisframe = this;
+        thisframe.setEnabled(false);
+        
+        amf.addWindowListener(new WindowListener() {
+            @Override
+            public void windowClosed(WindowEvent arg0) {
+                if (MyWindowEvent.isExitAndSave(arg0)) {
+                    em.merge(a);
+                    artistList.set(s, a);
+                    em.getTransaction().commit();
+                    em.getTransaction().begin();
+                }
+                else{
+                    em.getTransaction().rollback();
+                    em.getTransaction().begin();
+                    java.util.Collection data = artistQuery.getResultList();
+                    for (Object entity : data){
+                        em.refresh(entity);
+                    }
+                    artistList.clear();
+                    artistList.addAll(data);
+                }
+                thisframe.setEnabled(true);
+                checkControls();
+            }
+
+            @Override
+            public void windowActivated(WindowEvent arg0) {
+                System.out.println("Window Activated");
+            }
+
+            @Override
+            public void windowClosing(WindowEvent arg0) {
+                System.out.println("Window Closing");
+                thisframe.setEnabled(true);
+            }
+
+            @Override
+            public void windowDeactivated(WindowEvent arg0) {
+                System.out.println("Window Deactivated");
+                thisframe.setEnabled(true);
+            }
+
+            @Override
+            public void windowDeiconified(WindowEvent arg0) {
+                System.out.println("Window Deiconified");
+            }
+
+            @Override
+            public void windowIconified(WindowEvent arg0) {
+                System.out.println("Window Iconified");
+            }
+
+            @Override
+            public void windowOpened(WindowEvent arg0) {
+                System.out.println("Window Opened");
+            }
+        });
+    }//GEN-LAST:event_jButton3ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

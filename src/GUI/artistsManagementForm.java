@@ -8,6 +8,7 @@ package GUI;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import javax.persistence.EntityManager;
+import javax.swing.JOptionPane;
 import model.Artist;
 import model.DBManager;
 import model.Musicgenre;
@@ -20,22 +21,24 @@ import model.Musicgenre;
 public class artistsManagementForm extends javax.swing.JFrame {
     private EntityManager em;
     Artist artist1;
+    
     /**
      * Creates new form artistsManagementForm
      */
     public artistsManagementForm(Artist a) {
         em = DBManager.em;
         artist1 = a;
-        System.out.println("Firstname: " + artist1.getFirstname() + ", Lastname: " + artist1.getLastname());
+
         initComponents();
-        
-        // Αλλαγή του τρόπου που κλέινει το παράθυρο με το x
-        super.addWindowListener(new java.awt.event.WindowAdapter(){
-            @Override
-            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-            new mainGUI().setVisible(true);
-            }
-        });
+        if (!(artist1.getLastname().isEmpty())) {
+            jTextField1.setText(artist1.getLastname());
+            jTextField2.setText(artist1.getFirstname());
+            jTextField3.setText(artist1.getArtisticname());
+            jComboBox1.setSelectedIndex(((artist1.getSex().equals("Male")) ? 0 : 1));
+            jDateChooser1.setDate(artist1.getBirthday());
+            jTextField6.setText(artist1.getBirthplace());
+            jComboBox2.setSelectedItem(artist1.getMusicgenregenreId());
+        }
     }
 
     /**
@@ -51,6 +54,7 @@ public class artistsManagementForm extends javax.swing.JFrame {
         musicgenreQuery = java.beans.Beans.isDesignTime() ? null : em.createQuery("SELECT m FROM Musicgenre m");
         musicgenreList = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : musicgenreQuery.getResultList();
         musicGenreRenderer1 = new GUI.musicGenreRenderer();
+        artist2 = artist1;
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -71,7 +75,6 @@ public class artistsManagementForm extends javax.swing.JFrame {
 
         musicGenreRenderer1.setText("musicGenreRenderer1");
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Φόρμα Διαχείρισης Καλλιτέχνη");
         setResizable(false);
 
@@ -93,6 +96,18 @@ public class artistsManagementForm extends javax.swing.JFrame {
 
         jLabel8.setText("Είδος μουσικής");
 
+        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, artist2, org.jdesktop.beansbinding.ELProperty.create("${lastname}"), jTextField1, org.jdesktop.beansbinding.BeanProperty.create("text"));
+        bindingGroup.addBinding(binding);
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, artist2, org.jdesktop.beansbinding.ELProperty.create("${firstname}"), jTextField2, org.jdesktop.beansbinding.BeanProperty.create("text"));
+        bindingGroup.addBinding(binding);
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, artist2, org.jdesktop.beansbinding.ELProperty.create("${artisticname}"), jTextField3, org.jdesktop.beansbinding.BeanProperty.create("text"));
+        bindingGroup.addBinding(binding);
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, artist2, org.jdesktop.beansbinding.ELProperty.create("${birthplace}"), jTextField6, org.jdesktop.beansbinding.BeanProperty.create("text"));
+        bindingGroup.addBinding(binding);
+
         jButton1.setText("Ακύρωση");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -108,11 +123,21 @@ public class artistsManagementForm extends javax.swing.JFrame {
         });
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Male", "Female" }));
+        jComboBox1.setSelectedIndex(0);
+        jComboBox1.setSelectedItem("Male");
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, artist2, org.jdesktop.beansbinding.ELProperty.create("${sex}"), jComboBox1, org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
+        bindingGroup.addBinding(binding);
 
         jComboBox2.setRenderer(musicGenreRenderer1);
 
         org.jdesktop.swingbinding.JComboBoxBinding jComboBoxBinding = org.jdesktop.swingbinding.SwingBindings.createJComboBoxBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, musicgenreList, jComboBox2);
         bindingGroup.addBinding(jComboBoxBinding);
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, artist2, org.jdesktop.beansbinding.ELProperty.create("${musicgenregenreId}"), jComboBox2, org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
+        bindingGroup.addBinding(binding);
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, artist2, org.jdesktop.beansbinding.ELProperty.create("${birthday}"), jDateChooser1, org.jdesktop.beansbinding.BeanProperty.create("date"));
+        bindingGroup.addBinding(binding);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -140,19 +165,17 @@ public class artistsManagementForm extends javax.swing.JFrame {
                                 .addComponent(jLabel7, javax.swing.GroupLayout.Alignment.TRAILING)
                                 .addComponent(jLabel8, javax.swing.GroupLayout.Alignment.TRAILING))
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(jTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 90, Short.MAX_VALUE)
-                                .addComponent(jTextField3, javax.swing.GroupLayout.DEFAULT_SIZE, 90, Short.MAX_VALUE)
-                                .addComponent(jTextField6, javax.swing.GroupLayout.DEFAULT_SIZE, 90, Short.MAX_VALUE)
-                                .addComponent(jTextField1)
-                                .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(jTextField6)
+                                .addComponent(jDateChooser1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 130, Short.MAX_VALUE)
+                                .addComponent(jTextField3, javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jTextField2, javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jTextField1, javax.swing.GroupLayout.Alignment.LEADING)
                                 .addComponent(jComboBox2, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jDateChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                .addComponent(jComboBox1, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGap(0, 0, Short.MAX_VALUE))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-
-        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jComboBox1, jComboBox2, jDateChooser1, jTextField1, jTextField2, jTextField3, jTextField6});
-
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
@@ -173,7 +196,7 @@ public class artistsManagementForm extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jComboBox1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel6)
@@ -205,37 +228,34 @@ public class artistsManagementForm extends javax.swing.JFrame {
             l.windowClosed(we);
         }
         this.setVisible(false);
-        //this.dispose();
     }
     
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        em.getTransaction().rollback();
+        em.getTransaction().begin();
         closeMe(false);
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        Musicgenre m = new Musicgenre();
-        m.setGenreId(new Long(3));
-        m.setName("POP");
         Artist a = new Artist();
-        a.setLastname(jTextField1.getText());
-        a.setFirstname(jTextField2.getText());
-        a.setArtisticname(jTextField3.getText());
-        a.setSex(jComboBox1.getSelectedItem().toString());
-        //a.setBirthday(jTextField5.getText());
-        a.setBirthday(jDateChooser1.getDate());
-        //a.setBirthday(null);
-        a.setBirthplace(jTextField6.getText());
-        //a.setMusicgenregenreId(m);
-        a.setMusicgenregenreId((Musicgenre) jComboBox2.getSelectedItem());
-        System.out.println("Firstname: " + a.getFirstname() + ", Lastname: " + a.getLastname());
-        em.persist(a);
-        em.getTransaction().commit();
-        em.getTransaction().begin();
-        closeMe(true);
+        if (!(jTextField1.getText().isEmpty()) && !(jTextField2.getText().isEmpty())) {
+            a.setLastname(jTextField1.getText());
+            a.setFirstname(jTextField2.getText());
+            a.setArtisticname(jTextField3.getText());
+            a.setSex((String)jComboBox1.getSelectedItem());
+            a.setBirthday(jDateChooser1.getDate());
+            a.setBirthplace(jTextField6.getText());
+            a.setMusicgenregenreId((Musicgenre) jComboBox2.getSelectedItem());
+            closeMe(true);
+        }
+        else {
+            JOptionPane.showMessageDialog(this, "Τα πεδία 'Επώνυμο' και 'Όνομα' δεν μπορούν να είναι κενά.\nΠαρακαλώ διορθώστε ή πατήστε ακύρωση.", "Λάθος στην εισαγωγή", JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_jButton2ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private model.Artist artist2;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JComboBox jComboBox1;

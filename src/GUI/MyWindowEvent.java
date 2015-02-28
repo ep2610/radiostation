@@ -7,6 +7,8 @@ package GUI;
 
 import java.awt.Window;
 import java.awt.event.WindowEvent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 
 /**
  *
@@ -18,5 +20,13 @@ public class MyWindowEvent extends WindowEvent{
     public MyWindowEvent(Window source, int id, boolean exitAndSave) {
         super(source, id);
         this.exitAndSave = exitAndSave;
+    }
+    
+    public static boolean isExitAndSave(WindowEvent arg0) {          
+        if (arg0 instanceof MyWindowEvent) {
+            return ((MyWindowEvent) arg0).exitAndSave;
+        } else {
+            return false;
+        }
     }
 }

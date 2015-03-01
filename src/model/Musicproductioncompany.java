@@ -5,6 +5,8 @@
  */
 package model;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.Basic;
@@ -18,6 +20,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -35,6 +38,8 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Musicproductioncompany.findByAddress", query = "SELECT m FROM Musicproductioncompany m WHERE m.address = :address"),
     @NamedQuery(name = "Musicproductioncompany.findByTelephone", query = "SELECT m FROM Musicproductioncompany m WHERE m.telephone = :telephone")})
 public class Musicproductioncompany implements Serializable {
+    @Transient
+    private PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -68,7 +73,9 @@ public class Musicproductioncompany implements Serializable {
     }
 
     public void setCompanyId(Long companyId) {
+        Long oldCompanyId = this.companyId;
         this.companyId = companyId;
+        changeSupport.firePropertyChange("companyId", oldCompanyId, companyId);
     }
 
     public String getName() {
@@ -76,7 +83,9 @@ public class Musicproductioncompany implements Serializable {
     }
 
     public void setName(String name) {
+        String oldName = this.name;
         this.name = name;
+        changeSupport.firePropertyChange("name", oldName, name);
     }
 
     public String getAddress() {
@@ -84,7 +93,9 @@ public class Musicproductioncompany implements Serializable {
     }
 
     public void setAddress(String address) {
+        String oldAddress = this.address;
         this.address = address;
+        changeSupport.firePropertyChange("address", oldAddress, address);
     }
 
     public String getTelephone() {
@@ -92,7 +103,9 @@ public class Musicproductioncompany implements Serializable {
     }
 
     public void setTelephone(String telephone) {
+        String oldTelephone = this.telephone;
         this.telephone = telephone;
+        changeSupport.firePropertyChange("telephone", oldTelephone, telephone);
     }
 
     @XmlTransient
@@ -127,6 +140,14 @@ public class Musicproductioncompany implements Serializable {
     @Override
     public String toString() {
         return "model.Musicproductioncompany[ companyId=" + companyId + " ]";
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        changeSupport.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        changeSupport.removePropertyChangeListener(listener);
     }
     
 }

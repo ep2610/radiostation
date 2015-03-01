@@ -57,16 +57,8 @@ public class groupsManagement extends javax.swing.JFrame {
         jTable1.getTableHeader().setReorderingAllowed(false);
 
         org.jdesktop.swingbinding.JTableBinding jTableBinding = org.jdesktop.swingbinding.SwingBindings.createJTableBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, musicgroupList, jTable1);
-        org.jdesktop.swingbinding.JTableBinding.ColumnBinding columnBinding = jTableBinding.addColumnBinding(org.jdesktop.beansbinding.ELProperty.create("${name}"));
-        columnBinding.setColumnName("Επωνυμία");
-        columnBinding.setColumnClass(String.class);
-        columnBinding.setEditable(false);
-        columnBinding = jTableBinding.addColumnBinding(org.jdesktop.beansbinding.ELProperty.create("${formationdate}"));
-        columnBinding.setColumnName("Ημερομηνία δημιουργίας");
-        columnBinding.setColumnClass(java.util.Date.class);
-        columnBinding.setEditable(false);
         bindingGroup.addBinding(jTableBinding);
-        jTableBinding.bind();
+
         jScrollPane1.setViewportView(jTable1);
 
         jButton1.setText("Εισαγωγή νέου");

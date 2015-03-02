@@ -69,10 +69,11 @@ public class Artist implements Serializable {
     private Date birthday;
     @Column(name = "BIRTHPLACE")
     private String birthplace;
-    @JoinTable(name = "ARTIST_MUSICGROUP", joinColumns = {
-        @JoinColumn(name = "ARTIST_ID", referencedColumnName = "ARTIST_ID")}, inverseJoinColumns = {
-        @JoinColumn(name = "GROUP_ID", referencedColumnName = "GROUP_ID")})
-    @ManyToMany
+    //@JoinTable(name = "ARTIST_MUSICGROUP", joinColumns = {
+    //    @JoinColumn(name = "ARTIST_ID", referencedColumnName = "ARTIST_ID")}, inverseJoinColumns = {
+    //    @JoinColumn(name = "GROUP_ID", referencedColumnName = "GROUP_ID")})
+    //@ManyToMany
+    @ManyToMany(mappedBy = "artistList")
     private List<Musicgroup> musicgroupList;
     @JoinTable(name = "ARTIST_ALBUM", joinColumns = {
         @JoinColumn(name = "ARTIST_ID", referencedColumnName = "ARTIST_ID")}, inverseJoinColumns = {

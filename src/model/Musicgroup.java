@@ -59,8 +59,8 @@ public class Musicgroup implements Serializable {
     //@ManyToMany(mappedBy = "musicgroupList")
     @ManyToMany(cascade=CascadeType.MERGE)
     @JoinTable(name = "ARTIST_MUSICGROUP", joinColumns = {
-        @JoinColumn(name = "GROUP_ID", referencedColumnName = "GROUP_ID" )}, inverseJoinColumns = {
-        @JoinColumn(name = "ARTIST_ID", referencedColumnName = "ARTIST_ID" )})
+        @JoinColumn(name = "GROUP_ID", referencedColumnName = "GROUP_ID")}, inverseJoinColumns = {
+        @JoinColumn(name = "ARTIST_ID", referencedColumnName = "ARTIST_ID")})
     private List<Artist> artistList;
     @ManyToMany(mappedBy = "musicgroupList")
     private List<Album> albumList;

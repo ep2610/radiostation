@@ -5,19 +5,89 @@
  */
 package GUI;
 
+import com.toedter.calendar.JTextFieldDateEditor;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.text.SimpleDateFormat;
+import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
+import javax.swing.JFrame;
+import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
+import model.Artist;
+import model.DBManager;
+import model.Musicgroup;
+import model.Playlist;
+import model.Song;
+
 /**
  *
  * @author sotos
  */
 public class songListsManagementForm extends javax.swing.JFrame {
-
+    SimpleDateFormat sdf = new SimpleDateFormat("mm:ss");
+    private EntityManager em;
+    Playlist playlist1;
+    List<Song> songList;
+    DefaultTableModel model;
+    int s;
+    
     /**
      * Creates new form songListsManagementForm
      */
-    public songListsManagementForm() {
+    public songListsManagementForm(Playlist pl) {
+        em = DBManager.em;
+        playlist1 = pl;
+        
         initComponents();
+        songList = list1;
+        model = getjTable1Model();
+        
+        // Γεμίζει τον πίνακα με τα τραγούδια της λίστας
+        setJTable(jTable1, list1);
+        
+        // Ορίζει το alignment στο jDateChoose
+        JTextFieldDateEditor dateEditor = (JTextFieldDateEditor)jDateChooser1.getDateEditor();
+        dateEditor.setHorizontalAlignment(JTextField.CENTER);
+        
+        // Γεμίζει ανάλογα τα πεδία στο GUI
+        if (!(playlist1.getName().isEmpty())) {
+            jTextField1.setText(playlist1.getName());
+            jDateChooser1.setDate(playlist1.getCreationdate());
+        }
+        
+        // Γίνεται έλεγχος και κατάλληλη ενεργοποίηση των κουμπιών
+        checkControls();
     }
 
+    
+    private void setJTable(javax.swing.JTable jTable, List<Song> obj) {
+        //Μεταβλητές
+        Long tmpGroupId;
+        Long tmpArtistId;
+        String tmpName ="";
+                
+        for (Song s : obj) {
+            if(s.getAlbumId().getMusicgroupList().size() > 0){
+                tmpGroupId = s.getAlbumId().getMusicgroupList().get(0).getGroupId();
+                System.out.println("Song Name: " + s.getTitle() + ", GroupID: " + tmpGroupId);
+                TypedQuery<Musicgroup> musicgroupQuery = em.createQuery("SELECT m FROM Musicgroup m WHERE m.groupId = :groupId", Musicgroup.class).setParameter("groupId", tmpGroupId);
+                Musicgroup g = musicgroupQuery.getSingleResult();
+                tmpName = g.getName();
+            }
+            else if(s.getAlbumId().getArtistList().size() > 0){
+                tmpArtistId = s.getAlbumId().getArtistList().get(0).getArtistId();
+                System.out.println("Song Name: " + s.getTitle() + ", ArtistID: " + tmpArtistId);
+                TypedQuery<Artist> artistQuery = em.createQuery("SELECT a FROM Artist a WHERE m.artistId = :artistId", Artist.class).setParameter("artistId", tmpArtistId);
+                Artist a = artistQuery.getSingleResult();
+                tmpName = (a.getLastname() + " " + a.getFirstname());
+            }
+            //Τοποθετεί στον πίνακα τις πληροφορίες των τραγουδιών
+            model.addRow(new Object[]{s.getTitle(), tmpName, sdf.format(s.getDuration())});
+        }
+     }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -27,6 +97,9 @@ public class songListsManagementForm extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        playlist2 = playlist1;
+        query1 = em.createQuery("SELECT s FROM Song s JOIN s.playlistList playlist WHERE playlist = :pl").setParameter("pl", playlist2);
+        list1 = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : org.jdesktop.observablecollections.ObservableCollections.observableList(query1.getResultList());
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -39,9 +112,8 @@ public class songListsManagementForm extends javax.swing.JFrame {
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
         jTextField1 = new javax.swing.JTextField();
-        jTextField2 = new javax.swing.JTextField();
+        jDateChooser1 = new com.toedter.calendar.JDateChooser();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Φόρμα Διαχείρισης Λίστας");
         setResizable(false);
 
@@ -59,16 +131,33 @@ public class songListsManagementForm extends javax.swing.JFrame {
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
+
             },
             new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
+                "Τίτλος", "Καλλιτέχνης/Συγκρότημα", "Διάρκεια"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jTable1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        jTable1.getTableHeader().setReorderingAllowed(false);
+        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable1MouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(jTable1);
+        if (jTable1.getColumnModel().getColumnCount() > 0) {
+            jTable1.getColumnModel().getColumn(0).setPreferredWidth(200);
+            jTable1.getColumnModel().getColumn(1).setPreferredWidth(200);
+            jTable1.getColumnModel().getColumn(2).setPreferredWidth(50);
+        }
 
         jButton1.setText("Εισαγωγή");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -86,14 +175,12 @@ public class songListsManagementForm extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jButton1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jButton2)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -129,11 +216,10 @@ public class songListsManagementForm extends javax.swing.JFrame {
                             .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.TRAILING))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(jTextField2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
-                                .addComponent(jTextField1, javax.swing.GroupLayout.Alignment.LEADING))))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(jDateChooser1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jTextField1, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(10, 10, 10)
                         .addComponent(jLabel1))
@@ -154,9 +240,9 @@ public class songListsManagementForm extends javax.swing.JFrame {
                     .addComponent(jLabel2)
                     .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel3)
-                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jDateChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel4)
@@ -172,21 +258,48 @@ public class songListsManagementForm extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    // Έλεγχος και ενεργοποίηση των κουμπιών
+    private void checkControls() {
+        s = jTable1.getSelectedRow();
+        jButton2.setEnabled(s >= 0);
+    }
+    
+    private void closeMe(boolean exitAndSave) {
+        MyWindowEvent we = new MyWindowEvent(this, WindowEvent.WINDOW_CLOSED, exitAndSave);
+        for (WindowListener l : this.getWindowListeners()) {
+            l.windowClosed(we);
+        }
+        this.setVisible(false);
+    }
+    
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        this.dispose();
+        em.getTransaction().rollback();
+        em.getTransaction().begin();
+        closeMe(false);
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        searchAndInsertSong sais = new searchAndInsertSong();
+        searchAndInsertSong sais = new searchAndInsertSong(this);
+        
         sais.setVisible(true);
+        JFrame thisframe = this;
+        thisframe.setEnabled(false);
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
+        checkControls();
+    }//GEN-LAST:event_jTable1MouseClicked
+
+    public DefaultTableModel getjTable1Model() {
+        return (DefaultTableModel)jTable1.getModel();
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
+    private com.toedter.calendar.JDateChooser jDateChooser1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -195,6 +308,8 @@ public class songListsManagementForm extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
     private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
+    private java.util.List<Song> list1;
+    private model.Playlist playlist2;
+    private javax.persistence.Query query1;
     // End of variables declaration//GEN-END:variables
 }

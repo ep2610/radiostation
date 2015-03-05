@@ -5,16 +5,26 @@
  */
 package GUI;
 
+import javax.persistence.EntityManager;
+import model.DBManager;
+import model.Playlist;
+
 /**
  *
  * @author sotos
  */
 public class searchAndInsertSong extends javax.swing.JFrame {
-
+    private EntityManager em;
+    private songListsManagementForm slmf;
+    Playlist playlist1;
+    
     /**
      * Creates new form searchAndInsertSong
      */
-    public searchAndInsertSong() {
+    public searchAndInsertSong(songListsManagementForm slmf) {
+        em = DBManager.em;
+        this.slmf = slmf;
+        playlist1 = slmf.playlist1;
         initComponents();
     }
 
@@ -28,9 +38,9 @@ public class searchAndInsertSong extends javax.swing.JFrame {
     private void initComponents() {
         bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
-        RadioStationPUEntityManager = java.beans.Beans.isDesignTime() ? null : javax.persistence.Persistence.createEntityManagerFactory("RadioStationPU").createEntityManager();
-        songQuery = java.beans.Beans.isDesignTime() ? null : RadioStationPUEntityManager.createQuery("SELECT s FROM Song s");
-        songList = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : songQuery.getResultList();
+        playlist2 = playlist1;
+        songQuery = em.createQuery("SELECT s FROM Song s WHERE s NOT IN (SELECT s FROM Song s JOIN s.playlistList playlist WHERE playlist = :pl) ORDER BY s.title").setParameter("pl", playlist2);
+        songList = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : org.jdesktop.observablecollections.ObservableCollections.observableList(songQuery.getResultList());
         jLabel1 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
@@ -40,7 +50,6 @@ public class searchAndInsertSong extends javax.swing.JFrame {
         jButton2 = new javax.swing.JButton();
         jButton3 = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Αναζήτηση και Εισαγωγή Τραγουδιών");
         setResizable(false);
 
@@ -128,7 +137,6 @@ public class searchAndInsertSong extends javax.swing.JFrame {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.persistence.EntityManager RadioStationPUEntityManager;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
@@ -137,6 +145,7 @@ public class searchAndInsertSong extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
     private javax.swing.JTextField jTextField1;
+    private model.Playlist playlist2;
     private java.util.List<model.Song> songList;
     private javax.persistence.Query songQuery;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;

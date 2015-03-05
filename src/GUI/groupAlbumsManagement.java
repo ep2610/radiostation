@@ -11,6 +11,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.swing.table.DefaultTableModel;
 import model.*;
+import java.text.SimpleDateFormat;
 
 /**
  *
@@ -20,6 +21,7 @@ public class groupAlbumsManagement extends javax.swing.JFrame {
     private static EntityManager em;    
     private List<Album> albumList1 = new ArrayList<>();  //καλάθι
     private DefaultTableModel model;
+    SimpleDateFormat sdf = new SimpleDateFormat("d MMM yyyy");
 
     /**
      * Creates new form groupAlbumsManagement
@@ -72,7 +74,7 @@ public class groupAlbumsManagement extends javax.swing.JFrame {
             tmpGroupName = g.getName();
 
             //Τοποθετεί στον πίνακα τις πληροφορίες των album
-            model.addRow(new Object[]{a.getTitle(), a.getType(), a.getMusicproductioncompanycompanyId().getName(), a.getDisknumber(), tmpGroupName, a.getReleasedate()});
+            model.addRow(new Object[]{a.getTitle(), a.getType(), a.getMusicproductioncompanycompanyId().getName(), a.getDisknumber(), tmpGroupName, sdf.format(a.getReleasedate())});
         }
      }
 

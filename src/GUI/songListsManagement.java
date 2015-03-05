@@ -5,17 +5,32 @@
  */
 package GUI;
 
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import javax.persistence.EntityManager;
+import javax.swing.JFrame;
+import model.DBManager;
+import model.Playlist;
+
 /**
  *
  * @author sotos
  */
 public class songListsManagement extends javax.swing.JFrame {
-
+    private EntityManager em;
+    int s;
+    Playlist pl;
+    
     /**
      * Creates new form songListsManagement
      */
     public songListsManagement() {
+        em = DBManager.em;
+        if (!em.getTransaction().isActive()) {
+            em.getTransaction().begin();
+        }
         initComponents();
+        checkControls();
         // Αλλαγή του τρόπου που κλέινει το παράθυρο με το x
         super.addWindowListener(new java.awt.event.WindowAdapter(){
             @Override
@@ -25,6 +40,13 @@ public class songListsManagement extends javax.swing.JFrame {
         });
     }
 
+    // Ενεργοποιεί κατάλληλα τα κουμπιά διαγραφής και επεξεργασίας
+    private void checkControls() {
+        s = jTable1.getSelectedRow();
+        jButton2.setEnabled(s >= 0);
+        jButton3.setEnabled(s >= 0);
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -36,8 +58,8 @@ public class songListsManagement extends javax.swing.JFrame {
         bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
         RadioStationPUEntityManager = java.beans.Beans.isDesignTime() ? null : javax.persistence.Persistence.createEntityManagerFactory("RadioStationPU").createEntityManager();
-        playlistQuery = java.beans.Beans.isDesignTime() ? null : RadioStationPUEntityManager.createQuery("SELECT p FROM Playlist p");
-        playlistList = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : playlistQuery.getResultList();
+        playlistQuery = java.beans.Beans.isDesignTime() ? null : em.createQuery("SELECT p FROM Playlist p");
+        playlistList = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : org.jdesktop.observablecollections.ObservableCollections.observableList(playlistQuery.getResultList());
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
@@ -48,7 +70,7 @@ public class songListsManagement extends javax.swing.JFrame {
         jButton5 = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Λίστες Τραγουδιών");
         setResizable(false);
 
@@ -70,6 +92,11 @@ public class songListsManagement extends javax.swing.JFrame {
         columnBinding.setEditable(false);
         bindingGroup.addBinding(jTableBinding);
         jTableBinding.bind();
+        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable1MouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(jTable1);
 
         jButton1.setText("Δημιουργία");
@@ -82,6 +109,11 @@ public class songListsManagement extends javax.swing.JFrame {
         jButton2.setText("Διαγραφή");
 
         jButton3.setText("Ενημέρωση");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         jButton4.setText("Έξοδος");
         jButton4.addActionListener(new java.awt.event.ActionListener() {
@@ -160,7 +192,7 @@ public class songListsManagement extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        songListsManagementForm slmf = new songListsManagementForm();
+        songListsManagementForm slmf = new songListsManagementForm(pl);
         slmf.setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -173,6 +205,83 @@ public class songListsManagement extends javax.swing.JFrame {
         importXML ixml = new importXML();
         ixml.setVisible(true);
     }//GEN-LAST:event_jButton6ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        s = jTable1.getSelectedRow();
+        pl = playlistList.get(s);
+        songListsManagementForm slmf = new songListsManagementForm(pl);
+        
+        slmf.setVisible(true);
+        JFrame thisframe = this;
+        thisframe.setEnabled(false);
+        
+        slmf.addWindowListener(new WindowListener() {
+            @Override
+            public void windowClosed(WindowEvent arg0) {
+                if (MyWindowEvent.isExitAndSave(arg0)) {
+                //    System.out.println("**************************");
+                //    System.out.println("Group Name: " + m.getName());
+                //    System.out.println("Group Formation date: " + m.getFormationdate());
+                //    System.out.println("*** Artists Of This Group ***");
+                //    for (Artist i : m.getArtistList()){
+                //        System.out.println("Artist: " + i.getLastname());
+                //    }
+                //    em.merge(m);
+                //    musicgroupList.set(s, m);
+                //    em.getTransaction().commit();
+                //    em.getTransaction().begin();
+                }
+                else{
+                //    em.getTransaction().rollback();
+                //    em.getTransaction().begin();
+                //    java.util.Collection data = musicgroupQuery.getResultList();
+                //    for (Object entity : data){
+                //        em.refresh(entity);
+                //    }
+                //    musicgroupList.clear();
+                //    musicgroupList.addAll(data);
+                }
+                thisframe.setEnabled(true);
+                checkControls();
+            }
+
+            @Override
+            public void windowActivated(WindowEvent arg0) {
+                System.out.println("Window Activated");
+            }
+
+            @Override
+            public void windowClosing(WindowEvent arg0) {
+                System.out.println("Window Closing");
+                thisframe.setEnabled(true);
+            }
+
+            @Override
+            public void windowDeactivated(WindowEvent arg0) {
+                System.out.println("Window Deactivated");
+                thisframe.setEnabled(true);
+            }
+
+            @Override
+            public void windowDeiconified(WindowEvent arg0) {
+                System.out.println("Window Deiconified");
+            }
+
+            @Override
+            public void windowIconified(WindowEvent arg0) {
+                System.out.println("Window Iconified");
+            }
+
+            @Override
+            public void windowOpened(WindowEvent arg0) {
+                System.out.println("Window Opened");
+            }
+        });
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
+        checkControls();
+    }//GEN-LAST:event_jTable1MouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

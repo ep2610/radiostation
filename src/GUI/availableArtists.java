@@ -5,16 +5,39 @@
  */
 package GUI;
 
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+import javax.persistence.EntityManager;
+import javax.swing.table.DefaultTableModel;
+import model.Artist;
+import model.DBManager;
+import model.Musicgroup;
+
 /**
  *
  * @author sotos
  */
 public class availableArtists extends javax.swing.JFrame {
-
+    SimpleDateFormat sdf = new SimpleDateFormat("d MMM yyyy");
+    private groupsManagementForm gmf;
+    private EntityManager em;
+    private List<Artist> selArtists = new ArrayList();
+    Artist a;
+    Musicgroup musicgroup1;
+    
     /**
      * Creates new form availableArtists
      */
-    public availableArtists() {
+    public availableArtists(groupsManagementForm gmf) {
+        em = DBManager.em;
+        this.gmf = gmf;
+        for(Artist a: gmf.getList1()){
+            selArtists.add(a);
+        }
+        musicgroup1 = gmf.musicgroup1;
         initComponents();
     }
 
@@ -28,35 +51,44 @@ public class availableArtists extends javax.swing.JFrame {
     private void initComponents() {
         bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
-        RadioStationPUEntityManager = java.beans.Beans.isDesignTime() ? null : javax.persistence.Persistence.createEntityManagerFactory("RadioStationPU").createEntityManager();
-        artistQuery = java.beans.Beans.isDesignTime() ? null : RadioStationPUEntityManager.createQuery("SELECT a FROM Artist a");
-        artistList = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : artistQuery.getResultList();
+        musicgroup2 = musicgroup1;
+        artistQuery = em.createQuery("SELECT a FROM Artist a WHERE a NOT IN (SELECT a FROM Artist a JOIN a.musicgroupList musicgroup WHERE musicgroup = :mg)").setParameter("mg", musicgroup2);
+        artistList = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : org.jdesktop.observablecollections.ObservableCollections.observableList(artistQuery.getResultList());
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Λίστα διαθέσιμων καλλιτεχνών");
+        setResizable(false);
 
         jLabel1.setFont(new java.awt.Font("Comic Sans MS", 0, 14)); // NOI18N
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/artist_18_18.png"))); // NOI18N
         jLabel1.setText("Διαθέσιμοι καλλιτέχνες");
 
+        jTable1.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        jTable1.getTableHeader().setReorderingAllowed(false);
+
         org.jdesktop.swingbinding.JTableBinding jTableBinding = org.jdesktop.swingbinding.SwingBindings.createJTableBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, artistList, jTable1);
         org.jdesktop.swingbinding.JTableBinding.ColumnBinding columnBinding = jTableBinding.addColumnBinding(org.jdesktop.beansbinding.ELProperty.create("${lastname}"));
-        columnBinding.setColumnName("Lastname");
+        columnBinding.setColumnName("Επώνυμο");
         columnBinding.setColumnClass(String.class);
+        columnBinding.setEditable(false);
         columnBinding = jTableBinding.addColumnBinding(org.jdesktop.beansbinding.ELProperty.create("${firstname}"));
-        columnBinding.setColumnName("Firstname");
+        columnBinding.setColumnName("Όνομα");
         columnBinding.setColumnClass(String.class);
+        columnBinding.setEditable(false);
         bindingGroup.addBinding(jTableBinding);
         jTableBinding.bind();
-
         jScrollPane1.setViewportView(jTable1);
 
         jButton1.setText("Εισαγωγή");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jButton2.setText("Ακύρωση");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -99,14 +131,34 @@ public class availableArtists extends javax.swing.JFrame {
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
-
+    
+    private void closeMe(boolean exitAndSave) {
+        MyWindowEvent we = new MyWindowEvent(this, WindowEvent.WINDOW_CLOSED, exitAndSave);
+        for (WindowListener l : this.getWindowListeners()) {
+            l.windowClosed(we);
+        }
+        this.setVisible(false);
+    }
+    
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        this.dispose();
+        em.getTransaction().rollback();
+        em.getTransaction().begin();
+        closeMe(false);
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        int[] sr = jTable1.getSelectedRows();
+        for (int i : sr){
+            a = artistList.get(i);
+            this.gmf.model.addRow(new Object[]{a.getLastname(),a.getFirstname(),a.getArtisticname(),sdf.format(a.getBirthday())});
+            selArtists.add(a);
+            gmf.artistsList.add(a);
+        }
+        closeMe(true);
+    }//GEN-LAST:event_jButton1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.persistence.EntityManager RadioStationPUEntityManager;
     private java.util.List<model.Artist> artistList;
     private javax.persistence.Query artistQuery;
     private javax.swing.JButton jButton1;
@@ -114,6 +166,7 @@ public class availableArtists extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
+    private model.Musicgroup musicgroup2;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 }

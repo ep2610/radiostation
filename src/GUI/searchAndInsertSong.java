@@ -5,18 +5,28 @@
  */
 package GUI;
 
+import java.text.SimpleDateFormat;
+import java.util.List;
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
+import javax.swing.table.DefaultTableModel;
+import model.Artist;
 import model.DBManager;
+import model.Musicgroup;
 import model.Playlist;
+import model.Song;
 
 /**
  *
  * @author sotos
  */
 public class searchAndInsertSong extends javax.swing.JFrame {
+    SimpleDateFormat sdf = new SimpleDateFormat("mm:ss");
     private EntityManager em;
     private songListsManagementForm slmf;
     Playlist playlist1;
+    DefaultTableModel model;
+    int s;
     
     /**
      * Creates new form searchAndInsertSong
@@ -26,8 +36,41 @@ public class searchAndInsertSong extends javax.swing.JFrame {
         this.slmf = slmf;
         playlist1 = slmf.playlist1;
         initComponents();
+        model = getjTable1Model();
+        
+        // Γεμίζει τον πίνακα με τα τραγούδια της λίστας
+        setJTable(jTable1, songList);
+        
+        // Γίνεται έλεγχος και κατάλληλη ενεργοποίηση των κουμπιών
+        checkControls();
     }
 
+    private void setJTable(javax.swing.JTable jTable, List<Song> obj) {
+        //Μεταβλητές
+        Long tmpGroupId;
+        Long tmpArtistId;
+        String tmpName ="";
+                
+        for (Song s : obj) {
+            if(s.getAlbumId().getMusicgroupList().size() > 0){
+                tmpGroupId = s.getAlbumId().getMusicgroupList().get(0).getGroupId();
+                System.out.println("Song Name: " + s.getTitle() + ", GroupID: " + tmpGroupId);
+                TypedQuery<Musicgroup> musicgroupQuery = em.createQuery("SELECT m FROM Musicgroup m WHERE m.groupId = :groupId", Musicgroup.class).setParameter("groupId", tmpGroupId);
+                Musicgroup g = musicgroupQuery.getSingleResult();
+                tmpName = g.getName();
+            }
+            else if(s.getAlbumId().getArtistList().size() > 0){
+                tmpArtistId = s.getAlbumId().getArtistList().get(0).getArtistId();
+                System.out.println("Song Name: " + s.getTitle() + ", ArtistID: " + tmpArtistId);
+                TypedQuery<Artist> artistQuery = em.createQuery("SELECT a FROM Artist a WHERE m.artistId = :artistId", Artist.class).setParameter("artistId", tmpArtistId);
+                Artist a = artistQuery.getSingleResult();
+                tmpName = (a.getLastname() + " " + a.getFirstname());
+            }
+            //Τοποθετεί στον πίνακα τις πληροφορίες των τραγουδιών
+            model.addRow(new Object[]{s.getTitle(), tmpName, sdf.format(s.getDuration())});
+        }
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -36,7 +79,6 @@ public class searchAndInsertSong extends javax.swing.JFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
         playlist2 = playlist1;
         songQuery = em.createQuery("SELECT s FROM Song s WHERE s NOT IN (SELECT s FROM Song s JOIN s.playlistList playlist WHERE playlist = :pl) ORDER BY s.title").setParameter("pl", playlist2);
@@ -62,18 +104,34 @@ public class searchAndInsertSong extends javax.swing.JFrame {
         jLabel2.setFont(new java.awt.Font("Comic Sans MS", 0, 11)); // NOI18N
         jLabel2.setText("Διαθέσιμα Τραγούδια");
 
-        jTable1.getTableHeader().setReorderingAllowed(false);
+        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
 
-        org.jdesktop.swingbinding.JTableBinding jTableBinding = org.jdesktop.swingbinding.SwingBindings.createJTableBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, songList, jTable1);
-        org.jdesktop.swingbinding.JTableBinding.ColumnBinding columnBinding = jTableBinding.addColumnBinding(org.jdesktop.beansbinding.ELProperty.create("${title}"));
-        columnBinding.setColumnName("Title");
-        columnBinding.setColumnClass(String.class);
-        columnBinding = jTableBinding.addColumnBinding(org.jdesktop.beansbinding.ELProperty.create("${duration}"));
-        columnBinding.setColumnName("Duration");
-        columnBinding.setColumnClass(java.util.Date.class);
-        bindingGroup.addBinding(jTableBinding);
-        jTableBinding.bind();
+            },
+            new String [] {
+                "Τίτλος", "Καλλιτέχνης/Συγκρότημα", "Διάρκεια"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jTable1.getTableHeader().setReorderingAllowed(false);
+        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable1MouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(jTable1);
+        if (jTable1.getColumnModel().getColumnCount() > 0) {
+            jTable1.getColumnModel().getColumn(0).setPreferredWidth(200);
+            jTable1.getColumnModel().getColumn(1).setPreferredWidth(200);
+            jTable1.getColumnModel().getColumn(2).setPreferredWidth(50);
+        }
 
         jButton2.setText("Εισαγωγή");
 
@@ -91,7 +149,7 @@ public class searchAndInsertSong extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 634, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(jTextField1)
@@ -125,16 +183,27 @@ public class searchAndInsertSong extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        bindingGroup.bind();
-
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    // Έλεγχος και ενεργοποίηση των κουμπιών
+    private void checkControls() {
+        s = jTable1.getSelectedRow();
+        jButton2.setEnabled(s >= 0);
+    }
+    
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         this.dispose();
     }//GEN-LAST:event_jButton3ActionPerformed
 
+    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
+        checkControls();
+    }//GEN-LAST:event_jTable1MouseClicked
+
+    public DefaultTableModel getjTable1Model() {
+        return (DefaultTableModel)jTable1.getModel();
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
@@ -148,6 +217,5 @@ public class searchAndInsertSong extends javax.swing.JFrame {
     private model.Playlist playlist2;
     private java.util.List<model.Song> songList;
     private javax.persistence.Query songQuery;
-    private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 }

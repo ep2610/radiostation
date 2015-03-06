@@ -7,10 +7,33 @@ package GUI;
 
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import model.DBManager;
 import model.Playlist;
+import model.Song;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  *
@@ -18,8 +41,11 @@ import model.Playlist;
  */
 public class songListsManagement extends javax.swing.JFrame {
     private EntityManager em;
+    private List<Song> selectedPlaylistSongs;
     int s;
     Playlist pl;
+    SimpleDateFormat sdf = new SimpleDateFormat("d MMM yyyy");
+    SimpleDateFormat stf = new SimpleDateFormat("mm:ss");
     
     /**
      * Creates new form songListsManagement
@@ -57,9 +83,10 @@ public class songListsManagement extends javax.swing.JFrame {
     private void initComponents() {
         bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
-        RadioStationPUEntityManager = java.beans.Beans.isDesignTime() ? null : javax.persistence.Persistence.createEntityManagerFactory("RadioStationPU").createEntityManager();
         playlistQuery = java.beans.Beans.isDesignTime() ? null : em.createQuery("SELECT p FROM Playlist p");
         playlistList = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : org.jdesktop.observablecollections.ObservableCollections.observableList(playlistQuery.getResultList());
+        playlist1 = new model.Playlist();
+        jFileChooser1 = new javax.swing.JFileChooser();
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
@@ -69,6 +96,11 @@ public class songListsManagement extends javax.swing.JFrame {
         jButton4 = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
+
+        jFileChooser1.setAcceptAllFileFilterUsed(false);
+        jFileChooser1.setDialogType(javax.swing.JFileChooser.SAVE_DIALOG);
+        jFileChooser1.setDialogTitle("");
+        jFileChooser1.setFileFilter(new CustomFilter());
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Λίστες Τραγουδιών");
@@ -143,21 +175,24 @@ public class songListsManagement extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                            .addComponent(jButton1)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jButton2)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jButton3)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jButton4))
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jButton5)
-                        .addGap(18, 18, 18)
-                        .addComponent(jButton6)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton6))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                    .addComponent(jButton1)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(jButton2)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(jButton3)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(jButton4))
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 375, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -197,13 +232,133 @@ public class songListsManagement extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        exportXML exml = new exportXML();
-        exml.setVisible(true);
+        jFileChooser1.setDialogTitle("Εξαγωγή Λίστας σε XML");
+        int index = jTable1.getSelectedRow();
+        if(index >= 0) {
+            playlist1 = playlistList.get(jTable1.convertRowIndexToModel(index));
+
+            selectedPlaylistSongs = playlist1.getSongList();
+            if (selectedPlaylistSongs.size() > 0){
+                // Επιλογή ονόματος και path για το xml αρχείο με τη βοήθεια ενός JFileChooser
+                int returnVal = jFileChooser1.showSaveDialog(this);
+                if(returnVal == JFileChooser.APPROVE_OPTION) {
+                    File file = new File(jFileChooser1.getSelectedFile() + ".xml");
+                    try {
+                        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+                        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+                        Document doc = docBuilder.newDocument();
+                        
+                        // Προετοιμασία του rootElement του xml αρχείου
+                        Element rootElement = doc.createElement("playlist");
+
+                        // Προετοιμασία των attributes της λίστας
+                        Attr attrId = doc.createAttribute("listId");
+                        attrId.setValue(playlist1.getListId().toString());
+                        rootElement.setAttributeNode(attrId);
+
+                        Attr attrName = doc.createAttribute("name");
+                        attrName.setValue(playlist1.getName());
+                        rootElement.setAttributeNode(attrName);
+                        
+                        Attr attrDate = doc.createAttribute("creationdate");
+                        attrDate.setValue(sdf.format(playlist1.getCreationdate()));
+                        rootElement.setAttributeNode(attrDate);
+                       
+                        doc.appendChild(rootElement);
+                        
+                        // Προετοιμασία του element για κάθε τραγούδι της λίστας
+                        for(Song s : selectedPlaylistSongs){
+                            Element song = doc.createElement("song");
+                            rootElement.appendChild(song);
+                            
+                            // Προετοιμασία των elements του κάθε τραγουδιού
+                            Element songId = doc.createElement("songId");
+                            songId.appendChild(doc.createTextNode(s.getSongId().toString()));
+                            song.appendChild(songId);
+                            
+                            Element songTitle = doc.createElement("title");
+                            songTitle.appendChild(doc.createTextNode(s.getTitle()));
+                            song.appendChild(songTitle);
+                            
+                            Element songDuration = doc.createElement("duration");
+                            songDuration.appendChild(doc.createTextNode(stf.format(s.getDuration())));
+                            song.appendChild(songDuration);
+                            
+                            Element songTracknr = doc.createElement("tracknr");
+                            songTracknr.appendChild(doc.createTextNode(Integer.toString(s.getTracknr())));
+                            song.appendChild(songTracknr);
+                            
+                            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                            Transformer transformer = transformerFactory.newTransformer();
+                            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                            transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+                            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+                            
+                            DOMSource source = new DOMSource(doc);
+                            
+                            StreamResult result;
+                            result = new StreamResult(file);
+                            transformer.transform(source, result);
+                        }
+                    JOptionPane.showMessageDialog(this, "Έγινε εξαγωγή της λίστας σε xml αρχείο με επιτυχία!");
+                    }catch(ParserConfigurationException pce){
+                        pce.printStackTrace();
+                    }catch(TransformerException tfe){
+                        tfe.printStackTrace();
+                    }
+                }
+            }else{
+                JOptionPane.showMessageDialog(this, "H επιλεγμένη λίστα τραγουδιών δεν έχει τραγούδια.");
+            }
+        }
+        else {
+            JOptionPane.showMessageDialog(this, "Δεν έχει επιλεγεί λίστα τραγουδιών.");
+        }
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
-        importXML ixml = new importXML();
-        ixml.setVisible(true);
+        jFileChooser1.setDialogTitle("Εισαγωγή Λίστας από XML");
+
+        // Επιλογή xml αρχείου με τη βοήθεια ενός JFileChooser
+        int returnVal = jFileChooser1.showOpenDialog(this);
+        if(returnVal == JFileChooser.APPROVE_OPTION) {
+            File file = jFileChooser1.getSelectedFile();
+            try {
+                DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+                Document doc = docBuilder.parse(file);
+                doc.getDocumentElement().normalize();
+                
+                Element playlistElement = doc.getDocumentElement();
+                System.out.println("Root element :" + playlistElement.getNodeName());
+                
+                //Playlist playlist = new Playlist();
+                //playlist.setCreationdate(new Date());
+                //playlist.setName(playlistElement.getAttribute("name"));
+                //em.persist(playlist);
+                
+                NodeList nList = doc.getElementsByTagName("song");
+                System.out.println("----------------------------");
+                
+                //List<Song> songList = new ArrayList<>();
+                for (int i = 0; i < nList.getLength(); i++){
+                    Node nNode = nList.item(i);
+                    System.out.println("\nCurrent Element :" + nNode.getNodeName());
+                    
+                    if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                        Element eElement = (Element) nNode;
+                        
+                        System.out.println("Song ID : " + eElement.getElementsByTagName("songId").item(0).getTextContent());
+			System.out.println("Song Title : " + eElement.getElementsByTagName("title").item(0).getTextContent());
+			System.out.println("Song Duration : " + eElement.getElementsByTagName("duration").item(0).getTextContent());
+			System.out.println("Song Tracknr : " + eElement.getElementsByTagName("tracknr").item(0).getTextContent());
+                    }
+                }
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
     }//GEN-LAST:event_jButton6ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
@@ -285,16 +440,17 @@ public class songListsManagement extends javax.swing.JFrame {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.persistence.EntityManager RadioStationPUEntityManager;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JButton jButton6;
+    private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
+    private model.Playlist playlist1;
     private java.util.List<model.Playlist> playlistList;
     private javax.persistence.Query playlistQuery;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;

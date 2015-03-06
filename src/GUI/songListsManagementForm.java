@@ -6,9 +6,11 @@
 package GUI;
 
 import com.toedter.calendar.JTextFieldDateEditor;
+import java.awt.Color;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -63,29 +65,38 @@ public class songListsManagementForm extends javax.swing.JFrame {
 
     
     private void setJTable(javax.swing.JTable jTable, List<Song> obj) {
-        //Μεταβλητές
         Long tmpGroupId;
         Long tmpArtistId;
         String tmpName ="";
+        int totalseconds = 0;
+        Calendar c = Calendar.getInstance();
                 
         for (Song s : obj) {
             if(s.getAlbumId().getMusicgroupList().size() > 0){
                 tmpGroupId = s.getAlbumId().getMusicgroupList().get(0).getGroupId();
-                System.out.println("Song Name: " + s.getTitle() + ", GroupID: " + tmpGroupId);
+                //System.out.println("Song Name: " + s.getTitle() + ", GroupID: " + tmpGroupId);
                 TypedQuery<Musicgroup> musicgroupQuery = em.createQuery("SELECT m FROM Musicgroup m WHERE m.groupId = :groupId", Musicgroup.class).setParameter("groupId", tmpGroupId);
                 Musicgroup g = musicgroupQuery.getSingleResult();
                 tmpName = g.getName();
             }
             else if(s.getAlbumId().getArtistList().size() > 0){
                 tmpArtistId = s.getAlbumId().getArtistList().get(0).getArtistId();
-                System.out.println("Song Name: " + s.getTitle() + ", ArtistID: " + tmpArtistId);
+                //System.out.println("Song Name: " + s.getTitle() + ", ArtistID: " + tmpArtistId);
                 TypedQuery<Artist> artistQuery = em.createQuery("SELECT a FROM Artist a WHERE m.artistId = :artistId", Artist.class).setParameter("artistId", tmpArtistId);
                 Artist a = artistQuery.getSingleResult();
                 tmpName = (a.getLastname() + " " + a.getFirstname());
             }
             //Τοποθετεί στον πίνακα τις πληροφορίες των τραγουδιών
             model.addRow(new Object[]{s.getTitle(), tmpName, sdf.format(s.getDuration())});
+            
+            // Αθροίζει τη διάρκεια των τραγουδιών
+            c.setTime(s.getDuration());
+            totalseconds += timeInSeconds(c);
         }
+        if(totalseconds < 1800){
+            jLabel5.setForeground(Color.red);
+        }
+        jLabel5.setText("Συνολική διάρκεια τραγουδιών =   " + sdf.format(secondsToTime(totalseconds).getTime()) + "   (hh:mm:ss)");
      }
     
     /**
@@ -109,6 +120,7 @@ public class songListsManagementForm extends javax.swing.JFrame {
         jTable1 = new javax.swing.JTable();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
+        jLabel5 = new javax.swing.JLabel();
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
         jTextField1 = new javax.swing.JTextField();
@@ -168,6 +180,9 @@ public class songListsManagementForm extends javax.swing.JFrame {
 
         jButton2.setText("Διαγραφή");
 
+        jLabel5.setForeground(new java.awt.Color(0, 153, 0));
+        jLabel5.setText("Συνολική διάρκεια τραγουδιών:");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -178,6 +193,8 @@ public class songListsManagementForm extends javax.swing.JFrame {
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 504, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jButton1)
+                        .addGap(28, 28, 28)
+                        .addComponent(jLabel5)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jButton2)))
                 .addContainerGap())
@@ -190,7 +207,8 @@ public class songListsManagementForm extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton1)
-                    .addComponent(jButton2))
+                    .addComponent(jButton2)
+                    .addComponent(jLabel5))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -293,6 +311,29 @@ public class songListsManagementForm extends javax.swing.JFrame {
     public DefaultTableModel getjTable1Model() {
         return (DefaultTableModel)jTable1.getModel();
     }
+    
+    private int timeInSeconds(Calendar c){
+        int hours = c.get(Calendar.HOUR_OF_DAY);
+        int minutes = c.get(Calendar.MINUTE);
+        int seconds = c.get(Calendar.SECOND);
+        int totalseconds = (hours * 3600) + (minutes * 60) + seconds;
+        return totalseconds;
+    }
+    
+    private Calendar secondsToTime(int totalseconds) {
+        Calendar c = Calendar.getInstance();
+        
+        int hours = totalseconds / 3600;
+        totalseconds = totalseconds % 3600;
+        int minutes = totalseconds / 60;
+        totalseconds = totalseconds % 60;
+        
+        c.set(Calendar.HOUR_OF_DAY, hours);
+        c.set(Calendar.MINUTE, minutes);
+        c.set(Calendar.SECOND, totalseconds);
+        
+        return c;
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
@@ -304,6 +345,7 @@ public class songListsManagementForm extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;

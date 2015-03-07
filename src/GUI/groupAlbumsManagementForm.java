@@ -16,7 +16,6 @@ import javax.swing.table.DefaultTableModel;
 import model.DBManager;
 import model.Musicgroup;
 import model.Song;
-
 /**
  *
  * @author sotos
@@ -51,6 +50,9 @@ List<Song> songList;
         bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
         album1 = new model.Album();
+        musicProdCompRenderer1 = new GUI.musicProdCompRenderer();
+        query2 = java.beans.Beans.isDesignTime() ? null : em.createQuery("SELECT mp FROM Musicproductioncompany mp");
+        list2 = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : query2.getResultList();
         musicGroupRenderer1 = new GUI.musicGroupRenderer();
         query1 = java.beans.Beans.isDesignTime() ? null : em.createQuery("SELECT m FROM Musicgroup m");
         list1 = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : query1.getResultList();
@@ -64,7 +66,6 @@ List<Song> songList;
         jLabel8 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
         jTextField3 = new javax.swing.JTextField();
-        jTextField4 = new javax.swing.JTextField();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
@@ -74,8 +75,10 @@ List<Song> songList;
         jButton4 = new javax.swing.JButton();
         jDateChooser1 = new com.toedter.calendar.JDateChooser();
         jComboBox1 = new javax.swing.JComboBox();
-        jButton6 = new javax.swing.JButton();
         jComboBox2 = new javax.swing.JComboBox();
+        jComboBox3 = new javax.swing.JComboBox();
+
+        musicProdCompRenderer1.setText("musicProdCompRenderer1");
 
         musicGroupRenderer1.setText("musicGroupRenderer1");
 
@@ -106,8 +109,6 @@ List<Song> songList;
                 jTextField1ActionPerformed(evt);
             }
         });
-
-        jTextField4.setEditable(false);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -191,16 +192,16 @@ List<Song> songList;
         jComboBox1.setSelectedIndex(-1);
         jComboBox1.setToolTipText("");
 
-        jButton6.setText("jButton6");
-        jButton6.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton6ActionPerformed(evt);
-            }
-        });
-
+        jComboBox2.setToolTipText("Επιλογή Συγκροτήματος");
         jComboBox2.setRenderer(musicGroupRenderer1);
 
         org.jdesktop.swingbinding.JComboBoxBinding jComboBoxBinding = org.jdesktop.swingbinding.SwingBindings.createJComboBoxBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, list1, jComboBox2);
+        bindingGroup.addBinding(jComboBoxBinding);
+
+        jComboBox3.setToolTipText("Επιλογή Εταιρείας Παραγωγής");
+        jComboBox3.setRenderer(musicProdCompRenderer1);
+
+        jComboBoxBinding = org.jdesktop.swingbinding.SwingBindings.createJComboBoxBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, list2, jComboBox3);
         bindingGroup.addBinding(jComboBoxBinding);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -226,35 +227,32 @@ List<Song> songList;
                                 .addContainerGap()
                                 .addComponent(jLabel8))
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(39, 39, 39)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(jLabel2)
-                                    .addComponent(jLabel3)
-                                    .addComponent(jLabel5)
-                                    .addComponent(jLabel4)
-                                    .addComponent(jLabel6))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGroup(layout.createSequentialGroup()
-                                            .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addComponent(jTextField1))
-                                    .addComponent(jDateChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addGroup(layout.createSequentialGroup()
                                 .addContainerGap()
-                                .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGap(29, 29, 29)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                            .addComponent(jLabel2)
+                                            .addComponent(jLabel3)
+                                            .addComponent(jLabel5)
+                                            .addComponent(jLabel4)
+                                            .addComponent(jLabel6)))
+                                    .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jTextField1)
+                                    .addComponent(jComboBox2, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(jComboBox3, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(jDateChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE))))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(14, Short.MAX_VALUE)
+                .addContainerGap(17, Short.MAX_VALUE)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -267,8 +265,7 @@ List<Song> songList;
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
-                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton6))
+                    .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
@@ -292,6 +289,8 @@ List<Song> songList;
                 .addContainerGap())
         );
 
+        jComboBox3.getAccessibleContext().setAccessibleName("");
+
         bindingGroup.bind();
 
         pack();
@@ -310,12 +309,6 @@ List<Song> songList;
     }//GEN-LAST:event_jButton3ActionPerformed
     
     
-    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
-      ProductionCompany prc = new ProductionCompany();
-      prc.setVisible(true);        
-      //this.setEnabled(false);
-    }//GEN-LAST:event_jButton6ActionPerformed
-
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         model.addRow(new java.util.Vector<String>(java.util.Arrays.asList(new String[]{"","",""})));
         // TODO add your handling code here:
@@ -358,9 +351,9 @@ List<Song> songList;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
-    private javax.swing.JButton jButton6;
     private javax.swing.JComboBox jComboBox1;
     private javax.swing.JComboBox jComboBox2;
+    private javax.swing.JComboBox jComboBox3;
     private com.toedter.calendar.JDateChooser jDateChooser1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
@@ -375,27 +368,13 @@ List<Song> songList;
     private javax.swing.JTable jTable1;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField3;
-    private javax.swing.JTextField jTextField4;
     private java.util.List<Musicgroup> list1;
+    private java.util.List list2;
     private GUI.musicGroupRenderer musicGroupRenderer1;
+    private GUI.musicProdCompRenderer musicProdCompRenderer1;
     private javax.persistence.Query query1;
+    private javax.persistence.Query query2;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
-
-//public javax.swing.JTextField getgrName() {
-        //return textArea;
-  //  }
-
-public javax.swing.JTextField getcoName() {
-        return jTextField4;
-    }
-    
-    public void setgrName(javax.swing.JTextField textArea) {
-        //this.textArea = textArea;
-    }
-
-    public void setcoName(javax.swing.JTextField jTextField4) {
-        this.jTextField4 = jTextField4;
-    }
 
 }

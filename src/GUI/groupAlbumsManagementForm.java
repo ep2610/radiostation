@@ -13,6 +13,8 @@ import javax.persistence.EntityManager;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import model.DBManager;
+import model.Musicgroup;
 import model.Song;
 
 /**
@@ -29,9 +31,12 @@ Song Song1;
 List<Song> songList;
 
     public groupAlbumsManagementForm() {
+        System.out.println("Point1");
+        em = DBManager.em;
         initComponents();
         //Song1 = so;
         model = getjTable1Model();
+        
         
     checkControls();
     }
@@ -43,7 +48,12 @@ List<Song> songList;
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
+        album1 = new model.Album();
+        musicGroupRenderer1 = new GUI.musicGroupRenderer();
+        query1 = java.beans.Beans.isDesignTime() ? null : em.createQuery("SELECT m FROM Musicgroup m");
+        list1 = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : query1.getResultList();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -66,6 +76,8 @@ List<Song> songList;
         jComboBox1 = new javax.swing.JComboBox();
         jButton6 = new javax.swing.JButton();
         jComboBox2 = new javax.swing.JComboBox();
+
+        musicGroupRenderer1.setText("musicGroupRenderer1");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Φόρμα Διαχείρισης 'Αλμπουμ Συγκροτήματος");
@@ -186,6 +198,11 @@ List<Song> songList;
             }
         });
 
+        jComboBox2.setRenderer(musicGroupRenderer1);
+
+        org.jdesktop.swingbinding.JComboBoxBinding jComboBoxBinding = org.jdesktop.swingbinding.SwingBindings.createJComboBoxBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, list1, jComboBox2);
+        bindingGroup.addBinding(jComboBoxBinding);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -275,6 +292,8 @@ List<Song> songList;
                 .addContainerGap())
         );
 
+        bindingGroup.bind();
+
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
@@ -334,6 +353,7 @@ List<Song> songList;
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private model.Album album1;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
@@ -356,6 +376,10 @@ List<Song> songList;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField3;
     private javax.swing.JTextField jTextField4;
+    private java.util.List<Musicgroup> list1;
+    private GUI.musicGroupRenderer musicGroupRenderer1;
+    private javax.persistence.Query query1;
+    private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 
 //public javax.swing.JTextField getgrName() {

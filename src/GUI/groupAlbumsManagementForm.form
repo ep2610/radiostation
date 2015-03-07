@@ -395,6 +395,7 @@
       </AccessibilityProperties>
       <BindingProperties>
         <BindingProperty name="elements" source="list2" target="jComboBox3" targetPath="elements" updateStrategy="0" immediately="false"/>
+        <BindingProperty name="selectedItem" source="album1" sourcePath="${musicproductioncompanycompanyId.companyId}" target="jComboBox3" targetPath="selectedItem" updateStrategy="0" immediately="false"/>
       </BindingProperties>
     </Component>
   </SubComponents>

@@ -134,6 +134,11 @@ public class searchAndInsertSong extends javax.swing.JFrame {
         }
 
         jButton2.setText("Εισαγωγή");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jButton3.setText("Ακύρωση");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
@@ -200,6 +205,10 @@ public class searchAndInsertSong extends javax.swing.JFrame {
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
         checkControls();
     }//GEN-LAST:event_jTable1MouseClicked
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     public DefaultTableModel getjTable1Model() {
         return (DefaultTableModel)jTable1.getModel();

@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.5" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
+  <NonVisualComponents>
+    <Component class="model.Album" name="album1">
+    </Component>
+  </NonVisualComponents>
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="2"/>
     <Property name="title" type="java.lang.String" value="&#x3a0;&#x3af;&#x3bd;&#x3b1;&#x3ba;&#x3b1;&#x3c2; &#x386;&#x3bb;&#x3bc;&#x3c0;&#x3bf;&#x3c5;&#x3bc; &#x3a3;&#x3c5;&#x3b3;&#x3ba;&#x3c1;&#x3bf;&#x3c4;&#x3b7;&#x3bc;&#x3ac;&#x3c4;&#x3c9;&#x3bd;"/>
@@ -90,6 +94,9 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="&#x394;&#x3b9;&#x3b1;&#x3b3;&#x3c1;&#x3b1;&#x3c6;&#x3ae;"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton2ActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="jButton3">
       <Properties>
@@ -162,6 +169,9 @@
               <TableHeader reorderingAllowed="false" resizingAllowed="true"/>
             </Property>
           </Properties>
+          <BindingProperties>
+            <BindingProperty name="elements" source="album1" target="jTable1" targetPath="elements" updateStrategy="0" immediately="true"/>
+          </BindingProperties>
         </Component>
       </SubComponents>
     </Container>

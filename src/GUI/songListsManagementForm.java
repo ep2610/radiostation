@@ -220,6 +220,11 @@ public class songListsManagementForm extends javax.swing.JFrame {
         });
 
         jButton4.setText("Αποθήκευση");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -307,6 +312,10 @@ public class songListsManagementForm extends javax.swing.JFrame {
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
         checkControls();
     }//GEN-LAST:event_jTable1MouseClicked
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton4ActionPerformed
 
     public DefaultTableModel getjTable1Model() {
         return (DefaultTableModel)jTable1.getModel();

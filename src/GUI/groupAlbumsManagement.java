@@ -86,9 +86,7 @@ public class groupAlbumsManagement extends javax.swing.JFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
-        bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
-        album1 = new model.Album();
         jLabel1 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
@@ -113,11 +111,6 @@ public class groupAlbumsManagement extends javax.swing.JFrame {
         });
 
         jButton2.setText("Διαγραφή");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
-            }
-        });
 
         jButton3.setText("Μεταβολή");
 
@@ -153,10 +146,6 @@ public class groupAlbumsManagement extends javax.swing.JFrame {
         });
         jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         jTable1.getTableHeader().setReorderingAllowed(false);
-
-        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, album1, org.jdesktop.beansbinding.ObjectProperty.create(), jTable1, org.jdesktop.beansbinding.BeanProperty.create("elements"));
-        bindingGroup.addBinding(binding);
-        binding.bind();
         jScrollPane1.setViewportView(jTable1);
         if (jTable1.getColumnModel().getColumnCount() > 0) {
             jTable1.getColumnModel().getColumn(0).setPreferredWidth(200);
@@ -204,8 +193,6 @@ public class groupAlbumsManagement extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        bindingGroup.bind();
-
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
@@ -220,13 +207,8 @@ public class groupAlbumsManagement extends javax.swing.JFrame {
         gamf.setVisible(true);
     }//GEN-LAST:event_jButton1ActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton2ActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private model.Album album1;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
@@ -234,6 +216,5 @@ public class groupAlbumsManagement extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
-    private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 }

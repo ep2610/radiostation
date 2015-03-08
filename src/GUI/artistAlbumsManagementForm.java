@@ -179,6 +179,11 @@ List<Song> songList;
                 jTable1MouseClicked(evt);
             }
         });
+        jTable1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jTable1KeyTyped(evt);
+            }
+        });
         jScrollPane1.setViewportView(jTable1);
         jTable1.getColumnModel().getColumn(0).setPreferredWidth(140);
         jTable1.getColumnModel().getColumn(1).setPreferredWidth(101);
@@ -360,6 +365,10 @@ List<Song> songList;
          evt.consume();
         }
     }//GEN-LAST:event_jTextField3KeyTyped
+
+    private void jTable1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTable1KeyTyped
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTable1KeyTyped
     
     private void closeMe(boolean exitAndSave) {
         MyWindowEvent we = new MyWindowEvent(this, WindowEvent.WINDOW_CLOSED, exitAndSave);

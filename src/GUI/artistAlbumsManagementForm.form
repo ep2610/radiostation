@@ -374,6 +374,7 @@
               </Properties>
               <Events>
                 <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jTable1MouseClicked"/>
+                <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="jTable1KeyTyped"/>
               </Events>
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="jTable1.getColumnModel().getColumn(0).setPreferredWidth(140);&#xa;jTable1.getColumnModel().getColumn(1).setPreferredWidth(101);&#xa;jTable1.getColumnModel().getColumn(2).setPreferredWidth(80);"/>

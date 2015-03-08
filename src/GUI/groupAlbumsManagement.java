@@ -5,6 +5,8 @@
  */
 package GUI;
 
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -12,25 +14,29 @@ import javax.persistence.TypedQuery;
 import javax.swing.table.DefaultTableModel;
 import model.*;
 import java.text.SimpleDateFormat;
+import javax.swing.JFrame;
 
 /**
  *
  * @author sotos
  */
 public class groupAlbumsManagement extends javax.swing.JFrame {
-    private static EntityManager em;    
-    private List<Album> albumList1 = new ArrayList<>();  //καλάθι
-    private DefaultTableModel model;
+   private EntityManager em;
+   int s;
+    Album al;
     SimpleDateFormat sdf = new SimpleDateFormat("d MMM yyyy");
-
+    SimpleDateFormat stf = new SimpleDateFormat("mm:ss");
+    Boolean newpressed;
+    private DefaultTableModel model;
+    private List<Album> albumList1 = new ArrayList<>();  //καλάθι
+    
     /**
      * Creates new form groupAlbumsManagement
      */
     public groupAlbumsManagement() {
-        try {
-            em = DBManager.em;
-        } catch (Exception e) {
-          System.out.println("ERROR:¨"+e.getMessage());
+        em = DBManager.em;
+        if (!em.getTransaction().isActive()) {
+            em.getTransaction().begin();
         }
         initComponents();
         setalbumlist();
@@ -56,7 +62,8 @@ public class groupAlbumsManagement extends javax.swing.JFrame {
                 }                    
         } catch (Exception e) { // Σε περίπτωση αποτυχίας τυπώνει σφάλμα
             System.out.println("ERROR:¨1"+e.getMessage());
-        }           
+        }
+       
     }
     
     // Μέθοδος πρόσθεσης κατάλληλα διαμορφωμένων γραμμών στον πίνακα
@@ -113,6 +120,11 @@ public class groupAlbumsManagement extends javax.swing.JFrame {
         jButton2.setText("Διαγραφή");
 
         jButton3.setText("Μεταβολή");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         jButton4.setText("Έξοδος");
         jButton4.addActionListener(new java.awt.event.ActionListener() {
@@ -203,9 +215,158 @@ public class groupAlbumsManagement extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        groupAlbumsManagementForm gamf = new groupAlbumsManagementForm();
+        //groupAlbumsManagementForm gamf = new groupAlbumsManagementForm();
+        //gamf.setVisible(true);
+        al = new Album();
+        al.setTitle("");
+        al.setType("");
+        al.setMusicproductioncompanycompanyId(null);
+        al.setDisknumber(null);
+        al.setMusicgroupList(null);
+        al.setReleasedate(null);
+        al.setSongList(null);
+        
+        
+        newpressed = true;
+        groupAlbumsManagementForm gamf = new groupAlbumsManagementForm(al, newpressed);
+        
         gamf.setVisible(true);
+        JFrame thisframe = this;
+        thisframe.setEnabled(false);
+        
+        gamf.addWindowListener(new WindowListener(){
+            
+            @Override
+            public void windowClosed(WindowEvent arg0) {
+                if (MyWindowEvent.isExitAndSave(arg0)){
+                    em.persist(al);
+                    albumList1.add(al);
+                    int row = albumList1.size() - 1;
+                    jTable1.setRowSelectionInterval(row, row);
+                    jTable1.scrollRectToVisible(jTable1.getCellRect(row, 0, true));
+                    em.getTransaction().commit();
+                    em.getTransaction().begin();
+                }
+                else{
+                    
+                }
+                thisframe.setEnabled(true);
+                //checkControls();
+            }
+            
+            @Override
+            public void windowOpened(WindowEvent e) {
+                System.out.println("Window Opened");
+            }
+
+            @Override
+            public void windowClosing(WindowEvent e) {
+                System.out.println("Window Closing");
+                thisframe.setEnabled(true);
+            }
+
+            @Override
+            public void windowIconified(WindowEvent e) {
+                System.out.println("Window Iconified");
+            }
+
+            @Override
+            public void windowDeiconified(WindowEvent e) {
+                System.out.println("Window Deiconified");
+            }
+
+            @Override
+            public void windowActivated(WindowEvent e) {
+                System.out.println("Window Activated");
+            }
+
+            @Override
+            public void windowDeactivated(WindowEvent e) {
+                System.out.println("Window Deactivated");
+                thisframe.setEnabled(true);
+            }
+            
+        });
+        
+  
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+         s = jTable1.getSelectedRow();
+         al = albumList1.get(s);
+        
+        newpressed = false;
+        
+        groupAlbumsManagementForm gamf = new groupAlbumsManagementForm(al, newpressed);
+        
+        gamf.setVisible(true);
+        JFrame thisframe = this;
+        thisframe.setEnabled(false);
+        
+        gamf.addWindowListener(new WindowListener(){
+            
+            @Override
+            public void windowClosed(WindowEvent arg0) {
+                if (MyWindowEvent.isExitAndSave(arg0)){
+                    em.merge(al);
+                    albumList1.set(s, al);
+                    em.getTransaction().commit();
+                    em.getTransaction().begin();
+                   
+                    //setJTable(jTable1, albumList1);
+                    
+                }
+                else{
+                    em.getTransaction().rollback();
+                    em.getTransaction().begin();
+                    java.util.Collection data = em.createQuery("SELECT a FROM Album a", Album.class).getResultList();
+                    for (Object entity : data){
+                    em.refresh(entity);
+                    }
+                    albumList1.clear();
+                    albumList1.addAll(data);
+                }
+                thisframe.setEnabled(true);
+                //checkControls();
+            }
+            
+            @Override
+            public void windowOpened(WindowEvent e) {
+                System.out.println("Window Opened");
+            }
+
+            @Override
+            public void windowClosing(WindowEvent e) {
+                System.out.println("Window Closing");
+                thisframe.setEnabled(true);
+            }
+
+            @Override
+            public void windowIconified(WindowEvent e) {
+                System.out.println("Window Iconified");
+            }
+
+            @Override
+            public void windowDeiconified(WindowEvent e) {
+                System.out.println("Window Deiconified");
+            }
+
+            @Override
+            public void windowActivated(WindowEvent e) {
+                System.out.println("Window Activated");
+            }
+
+            @Override
+            public void windowDeactivated(WindowEvent e) {
+                System.out.println("Window Deactivated");
+                thisframe.setEnabled(true);
+            }
+            
+        });
+        
+
+// TODO add your handling code here:
+    }//GEN-LAST:event_jButton3ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

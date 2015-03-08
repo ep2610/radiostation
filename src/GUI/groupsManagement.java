@@ -61,7 +61,7 @@ public class groupsManagement extends javax.swing.JFrame {
     private void initComponents() {
         bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
-        musicgroupQuery = java.beans.Beans.isDesignTime() ? null : em.createQuery("SELECT m FROM Musicgroup m");
+        musicgroupQuery = java.beans.Beans.isDesignTime() ? null : em.createQuery("SELECT m FROM Musicgroup m ORDER BY m.name");
         musicgroupList = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : org.jdesktop.observablecollections.ObservableCollections.observableList(musicgroupQuery.getResultList());
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -262,13 +262,6 @@ public class groupsManagement extends javax.swing.JFrame {
             @Override
             public void windowClosed(WindowEvent arg0) {
                 if (MyWindowEvent.isExitAndSave(arg0)) {
-                    System.out.println("**************************");
-                    System.out.println("Group Name: " + m.getName());
-                    System.out.println("Group Formation date: " + m.getFormationdate());
-                    System.out.println("*** Artists Of This Group ***");
-                    for (Artist i : m.getArtistList()){
-                        System.out.println("Artist: " + i.getLastname());
-                    }
                     em.merge(m);
                     musicgroupList.set(s, m);
                     em.getTransaction().commit();

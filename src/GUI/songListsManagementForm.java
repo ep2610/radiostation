@@ -15,6 +15,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 import model.Artist;
@@ -34,15 +35,19 @@ public class songListsManagementForm extends javax.swing.JFrame {
     List<Song> songList;
     DefaultTableModel model;
     int s;
+    Boolean newpressed;
+    Calendar c = Calendar.getInstance();
+    
     
     /**
      * Creates new form songListsManagementForm
      */
-    public songListsManagementForm(Playlist pl) {
+    public songListsManagementForm(Playlist pl, Boolean newpressed) {
         em = DBManager.em;
         playlist1 = pl;
-        
+        this.newpressed = newpressed;
         initComponents();
+        if(this.newpressed) jLabel5.setVisible(false);
         songList = list1;
         model = getjTable1Model();
         
@@ -64,24 +69,21 @@ public class songListsManagementForm extends javax.swing.JFrame {
     }
 
     
-    private void setJTable(javax.swing.JTable jTable, List<Song> obj) {
+    public void setJTable(javax.swing.JTable jTable, List<Song> obj) {
         Long tmpGroupId;
         Long tmpArtistId;
         String tmpName ="";
-        int totalseconds = 0;
-        Calendar c = Calendar.getInstance();
+        
                 
         for (Song s : obj) {
             if(s.getAlbumId().getMusicgroupList().size() > 0){
                 tmpGroupId = s.getAlbumId().getMusicgroupList().get(0).getGroupId();
-                //System.out.println("Song Name: " + s.getTitle() + ", GroupID: " + tmpGroupId);
                 TypedQuery<Musicgroup> musicgroupQuery = em.createQuery("SELECT m FROM Musicgroup m WHERE m.groupId = :groupId", Musicgroup.class).setParameter("groupId", tmpGroupId);
                 Musicgroup g = musicgroupQuery.getSingleResult();
                 tmpName = g.getName();
             }
             else if(s.getAlbumId().getArtistList().size() > 0){
                 tmpArtistId = s.getAlbumId().getArtistList().get(0).getArtistId();
-                //System.out.println("Song Name: " + s.getTitle() + ", ArtistID: " + tmpArtistId);
                 TypedQuery<Artist> artistQuery = em.createQuery("SELECT a FROM Artist a WHERE m.artistId = :artistId", Artist.class).setParameter("artistId", tmpArtistId);
                 Artist a = artistQuery.getSingleResult();
                 tmpName = (a.getLastname() + " " + a.getFirstname());
@@ -89,15 +91,29 @@ public class songListsManagementForm extends javax.swing.JFrame {
             //Τοποθετεί στον πίνακα τις πληροφορίες των τραγουδιών
             model.addRow(new Object[]{s.getTitle(), tmpName, sdf.format(s.getDuration())});
             
-            // Αθροίζει τη διάρκεια των τραγουδιών
+            checkDuration();
+        }
+     }
+    
+    // Υπολογίζει τη διάρκεια των τραγουδιών
+    private boolean checkDuration(){
+        boolean ok;
+        int totalseconds = 0;
+        for(Song s : songList){
             c.setTime(s.getDuration());
             totalseconds += timeInSeconds(c);
         }
         if(totalseconds < 1800){
             jLabel5.setForeground(Color.red);
+            ok = false;
+        }else{
+            jLabel5.setForeground(Color.BLACK);
+            ok = true;
         }
         jLabel5.setText("Συνολική διάρκεια τραγουδιών =   " + sdf.format(secondsToTime(totalseconds).getTime()) + "   (hh:mm:ss)");
-     }
+        jLabel5.setVisible(true);
+        return ok;
+    }
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -107,10 +123,13 @@ public class songListsManagementForm extends javax.swing.JFrame {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
+        bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
         playlist2 = playlist1;
         query1 = em.createQuery("SELECT s FROM Song s JOIN s.playlistList playlist WHERE playlist = :pl").setParameter("pl", playlist2);
         list1 = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : org.jdesktop.observablecollections.ObservableCollections.observableList(query1.getResultList());
+        query2 = java.beans.Beans.isDesignTime() ? null : em.createQuery("SELECT pl FROM Playlist pl");
+        list2 = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : org.jdesktop.observablecollections.ObservableCollections.observableList(query2.getResultList());
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -179,6 +198,11 @@ public class songListsManagementForm extends javax.swing.JFrame {
         });
 
         jButton2.setText("Διαγραφή");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jLabel5.setForeground(new java.awt.Color(0, 153, 0));
         jLabel5.setText("Συνολική διάρκεια τραγουδιών:");
@@ -225,6 +249,12 @@ public class songListsManagementForm extends javax.swing.JFrame {
                 jButton4ActionPerformed(evt);
             }
         });
+
+        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, playlist2, org.jdesktop.beansbinding.ELProperty.create("${name}"), jTextField1, org.jdesktop.beansbinding.BeanProperty.create("text"));
+        bindingGroup.addBinding(binding);
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, playlist2, org.jdesktop.beansbinding.ELProperty.create("${creationdate}"), jDateChooser1, org.jdesktop.beansbinding.BeanProperty.create("date"));
+        bindingGroup.addBinding(binding);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -277,6 +307,8 @@ public class songListsManagementForm extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        bindingGroup.bind();
+
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
@@ -307,14 +339,90 @@ public class songListsManagementForm extends javax.swing.JFrame {
         sais.setVisible(true);
         JFrame thisframe = this;
         thisframe.setEnabled(false);
+        
+        sais.addWindowListener(new WindowListener() {
+
+            @Override
+            public void windowClosed(WindowEvent e) {
+                thisframe.setEnabled(true);
+                checkControls();
+            }
+            
+            @Override
+            public void windowOpened(WindowEvent e) {
+                System.out.println("Window Opened");
+            }
+
+            @Override
+            public void windowClosing(WindowEvent e) {
+                System.out.println("Window Closing");
+                thisframe.setEnabled(true);
+            }
+
+            @Override
+            public void windowIconified(WindowEvent e) {
+                System.out.println("Window Iconified");
+            }
+
+            @Override
+            public void windowDeiconified(WindowEvent e) {
+                System.out.println("Window Deiconified");
+            }
+
+            @Override
+            public void windowActivated(WindowEvent e) {
+                System.out.println("Window Activated");
+            }
+
+            @Override
+            public void windowDeactivated(WindowEvent e) {
+                System.out.println("Window Deactivated");
+                thisframe.setEnabled(true);
+            }
+            
+        }
+        );
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
         checkControls();
     }//GEN-LAST:event_jTable1MouseClicked
 
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        s = jTable1.getSelectedRow();
+        Song song = songList.get(s);
+        model.removeRow(s);
+        songList.remove(song);
+        checkDuration();
+        checkControls();
+    }//GEN-LAST:event_jButton2ActionPerformed
+
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        // TODO add your handling code here:
+        Boolean notexists = true;
+        // Έλεγχος εάν έχει δοθεί περιγραφή και ημερομηνία
+        if (!(jTextField1.getText().isEmpty()) && !(jDateChooser1.getDate() == null) ){
+            // Έλεγχος εάν πρόκειται για εισαγωγή νέας λίστας
+            if (newpressed){
+                for(Playlist pl : list2){
+                    if(pl.getName().equals(playlist2.getName())) notexists = false;
+                }
+            }
+            // Έλεγχος εάν υπάρχει ήδη λίστα με το ίδιο όνομα
+            if (notexists){
+                // Έλεγχος εάν η λίστα είναι διάρκειας τουλάχιστον 30 λεπτών
+                if(checkDuration()){
+                    playlist2.setSongList(songList);
+                    closeMe(true);
+                }else {
+                    JOptionPane.showMessageDialog(this, "Η λίστα δεν είναι τουλάχιστον μισής ώρας.\nΠαρακαλώ διορθώστε ή πατήστε ακύρωση.", "Λάθος στην εισαγωγή", JOptionPane.WARNING_MESSAGE);
+                }
+            }else{
+                JOptionPane.showMessageDialog(this, "Η λίστα υπάρχει ήδη.\nΠαρακαλώ διορθώστε ή πατήστε ακύρωση.", "Λάθος στην εισαγωγή", JOptionPane.WARNING_MESSAGE);
+            }
+        }
+        else {
+            JOptionPane.showMessageDialog(this, "Όλα τα πεδία πρέπει να είναι συμπληρωμένα.\nΠαρακαλώ διορθώστε ή πατήστε ακύρωση.", "Λάθος στην εισαγωγή", JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_jButton4ActionPerformed
 
     public DefaultTableModel getjTable1Model() {
@@ -343,6 +451,10 @@ public class songListsManagementForm extends javax.swing.JFrame {
         
         return c;
     }
+    
+    public List<Song> getList1(){
+        return list1;
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
@@ -360,7 +472,10 @@ public class songListsManagementForm extends javax.swing.JFrame {
     private javax.swing.JTable jTable1;
     private javax.swing.JTextField jTextField1;
     private java.util.List<Song> list1;
+    private java.util.List<Playlist> list2;
     private model.Playlist playlist2;
     private javax.persistence.Query query1;
+    private javax.persistence.Query query2;
+    private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 }

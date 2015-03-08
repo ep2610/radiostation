@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.TypedQuery;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -46,6 +47,7 @@ public class songListsManagement extends javax.swing.JFrame {
     Playlist pl;
     SimpleDateFormat sdf = new SimpleDateFormat("d MMM yyyy");
     SimpleDateFormat stf = new SimpleDateFormat("mm:ss");
+    Boolean newpressed;
     
     /**
      * Creates new form songListsManagement
@@ -139,6 +141,11 @@ public class songListsManagement extends javax.swing.JFrame {
         });
 
         jButton2.setText("Διαγραφή");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jButton3.setText("Ενημέρωση");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
@@ -227,15 +234,79 @@ public class songListsManagement extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        songListsManagementForm slmf = new songListsManagementForm(pl);
+        pl = new Playlist();
+        pl.setName("");
+        pl.setCreationdate(null);
+        
+        newpressed = true;
+        songListsManagementForm slmf = new songListsManagementForm(pl, newpressed);
+        
         slmf.setVisible(true);
+        JFrame thisframe = this;
+        thisframe.setEnabled(false);
+        
+        slmf.addWindowListener(new WindowListener(){
+            
+            @Override
+            public void windowClosed(WindowEvent arg0) {
+                if (MyWindowEvent.isExitAndSave(arg0)){
+                    em.persist(pl);
+                    playlistList.add(pl);
+                    int row = playlistList.size() - 1;
+                    jTable1.setRowSelectionInterval(row, row);
+                    jTable1.scrollRectToVisible(jTable1.getCellRect(row, 0, true));
+                    em.getTransaction().commit();
+                    em.getTransaction().begin();
+                }
+                else{
+                    
+                }
+                thisframe.setEnabled(true);
+                checkControls();
+            }
+            
+            @Override
+            public void windowOpened(WindowEvent e) {
+                System.out.println("Window Opened");
+            }
+
+            @Override
+            public void windowClosing(WindowEvent e) {
+                System.out.println("Window Closing");
+                thisframe.setEnabled(true);
+            }
+
+            @Override
+            public void windowIconified(WindowEvent e) {
+                System.out.println("Window Iconified");
+            }
+
+            @Override
+            public void windowDeiconified(WindowEvent e) {
+                System.out.println("Window Deiconified");
+            }
+
+            @Override
+            public void windowActivated(WindowEvent e) {
+                System.out.println("Window Activated");
+            }
+
+            @Override
+            public void windowDeactivated(WindowEvent e) {
+                System.out.println("Window Deactivated");
+                thisframe.setEnabled(true);
+            }
+            
+        });
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         jFileChooser1.setDialogTitle("Εξαγωγή Λίστας σε XML");
+        //jFileChooser1.setSelectedFile(new File("fileToSave"));
         int index = jTable1.getSelectedRow();
         if(index >= 0) {
             playlist1 = playlistList.get(jTable1.convertRowIndexToModel(index));
+            jFileChooser1.setSelectedFile(new File(playlist1.getName()));
 
             selectedPlaylistSongs = playlist1.getSongList();
             if (selectedPlaylistSongs.size() > 0){
@@ -308,7 +379,7 @@ public class songListsManagement extends javax.swing.JFrame {
                     }
                 }
             }else{
-                JOptionPane.showMessageDialog(this, "H επιλεγμένη λίστα τραγουδιών δεν έχει τραγούδια.");
+                JOptionPane.showMessageDialog(this, "H επιλεγμένη λίστα δεν έχει τραγούδια.");
             }
         }
         else {
@@ -318,7 +389,7 @@ public class songListsManagement extends javax.swing.JFrame {
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
         jFileChooser1.setDialogTitle("Εισαγωγή Λίστας από XML");
-
+        
         // Επιλογή xml αρχείου με τη βοήθεια ενός JFileChooser
         int returnVal = jFileChooser1.showOpenDialog(this);
         if(returnVal == JFileChooser.APPROVE_OPTION) {
@@ -330,32 +401,42 @@ public class songListsManagement extends javax.swing.JFrame {
                 doc.getDocumentElement().normalize();
                 
                 Element playlistElement = doc.getDocumentElement();
-                System.out.println("Root element :" + playlistElement.getNodeName());
                 
-                //Playlist playlist = new Playlist();
-                //playlist.setCreationdate(new Date());
-                //playlist.setName(playlistElement.getAttribute("name"));
-                //em.persist(playlist);
+                Playlist playlist = new Playlist();
+                playlist.setCreationdate(new Date());
+                playlist.setName(playlistElement.getAttribute("name"));
                 
                 NodeList nList = doc.getElementsByTagName("song");
-                System.out.println("----------------------------");
                 
-                //List<Song> songList = new ArrayList<>();
+                List<Song> songList = new ArrayList<>();
                 for (int i = 0; i < nList.getLength(); i++){
                     Node nNode = nList.item(i);
-                    System.out.println("\nCurrent Element :" + nNode.getNodeName());
                     
                     if (nNode.getNodeType() == Node.ELEMENT_NODE) {
                         Element eElement = (Element) nNode;
-                        
-                        System.out.println("Song ID : " + eElement.getElementsByTagName("songId").item(0).getTextContent());
-			System.out.println("Song Title : " + eElement.getElementsByTagName("title").item(0).getTextContent());
-			System.out.println("Song Duration : " + eElement.getElementsByTagName("duration").item(0).getTextContent());
-			System.out.println("Song Tracknr : " + eElement.getElementsByTagName("tracknr").item(0).getTextContent());
+
+                        int tmpId = Integer.parseInt(eElement.getElementsByTagName("songId").item(0).getTextContent());
+                        TypedQuery<Song> songQuery = em.createQuery("SELECT s FROM Song s WHERE s.songId = :songId", Song.class).setParameter("songId", tmpId);
+                        Song s = songQuery.getSingleResult();
+                        songList.add(s);
                     }
                 }
+                playlist.setSongList(songList);
+                
+                em.persist(playlist);
+                em.getTransaction().commit();
+                em.getTransaction().begin();
+                
+                JOptionPane.showMessageDialog(this, "Η εισαγωγή της λίστας έγινε με επιτυχία.", "Επιτυχής εισαγωγή", JOptionPane.WARNING_MESSAGE);
+                java.util.Collection data = playlistQuery.getResultList(); 
+                for (Object entity : data) { 
+                    em.refresh(entity); 
+                } 
+                playlistList.clear(); 
+                playlistList.addAll(data);
             }catch (Exception e) {
-                e.printStackTrace();
+                //e.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Η εισαγωγή της λίστας απέτυχε.", "Ανεπιτυχής εισαγωγή", JOptionPane.WARNING_MESSAGE);
             }
         }
 
@@ -364,7 +445,9 @@ public class songListsManagement extends javax.swing.JFrame {
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         s = jTable1.getSelectedRow();
         pl = playlistList.get(s);
-        songListsManagementForm slmf = new songListsManagementForm(pl);
+        
+        newpressed = false;
+        songListsManagementForm slmf = new songListsManagementForm(pl, newpressed);
         
         slmf.setVisible(true);
         JFrame thisframe = this;
@@ -374,27 +457,20 @@ public class songListsManagement extends javax.swing.JFrame {
             @Override
             public void windowClosed(WindowEvent arg0) {
                 if (MyWindowEvent.isExitAndSave(arg0)) {
-                //    System.out.println("**************************");
-                //    System.out.println("Group Name: " + m.getName());
-                //    System.out.println("Group Formation date: " + m.getFormationdate());
-                //    System.out.println("*** Artists Of This Group ***");
-                //    for (Artist i : m.getArtistList()){
-                //        System.out.println("Artist: " + i.getLastname());
-                //    }
-                //    em.merge(m);
-                //    musicgroupList.set(s, m);
-                //    em.getTransaction().commit();
-                //    em.getTransaction().begin();
+                    em.merge(pl);
+                    playlistList.set(s, pl);
+                    em.getTransaction().commit();
+                    em.getTransaction().begin();
                 }
                 else{
-                //    em.getTransaction().rollback();
-                //    em.getTransaction().begin();
-                //    java.util.Collection data = musicgroupQuery.getResultList();
-                //    for (Object entity : data){
-                //        em.refresh(entity);
-                //    }
-                //    musicgroupList.clear();
-                //    musicgroupList.addAll(data);
+                    em.getTransaction().rollback();
+                    em.getTransaction().begin();
+                    java.util.Collection data = playlistQuery.getResultList();
+                    for (Object entity : data){
+                        em.refresh(entity);
+                    }
+                    playlistList.clear();
+                    playlistList.addAll(data);
                 }
                 thisframe.setEnabled(true);
                 checkControls();
@@ -437,6 +513,27 @@ public class songListsManagement extends javax.swing.JFrame {
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
         checkControls();
     }//GEN-LAST:event_jTable1MouseClicked
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        s = jTable1.getSelectedRow();
+        pl = playlistList.get(s);
+        Object[] options = {"Διαγραφή", "Ακύρωση"};
+        int n = JOptionPane.showOptionDialog(this, "Θέλετε να διαγράψετε τη λίστα " + pl.getName() + ";",
+                "Επιβεβαίωση Διαγραφής",
+                JOptionPane.OK_CANCEL_OPTION, 
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                options[1]);
+        
+        if(n == 0){
+            em.remove(pl);
+            playlistList.remove(pl);
+            em.getTransaction().commit();
+            em.getTransaction().begin();
+            checkControls();
+        }
+    }//GEN-LAST:event_jButton2ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

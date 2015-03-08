@@ -11,11 +11,14 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -53,7 +56,11 @@ public class Playlist implements Serializable {
     @Column(name = "CREATIONDATE")
     @Temporal(TemporalType.DATE)
     private Date creationdate;
-    @ManyToMany(mappedBy = "playlistList")
+    //@ManyToMany(mappedBy = "playlistList")
+    @ManyToMany(cascade=CascadeType.MERGE)
+    @JoinTable(name = "PLAYLIST_SONG", joinColumns = {
+        @JoinColumn(name = "LIST_ID", referencedColumnName = "LIST_ID")}, inverseJoinColumns = {
+        @JoinColumn(name = "SONG_ID", referencedColumnName = "SONG_ID")})
     private List<Song> songList;
 
     public Playlist() {

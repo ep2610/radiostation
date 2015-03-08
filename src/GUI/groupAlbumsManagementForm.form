@@ -3,6 +3,9 @@
 <Form version="1.6" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
   <NonVisualComponents>
     <Component class="model.Album" name="album1">
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="a"/>
+      </AuxValues>
     </Component>
     <Component class="GUI.musicProdCompRenderer" name="musicProdCompRenderer1">
       <Properties>
@@ -45,6 +48,30 @@
       </Properties>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;Musicgroup&gt;"/>
+      </AuxValues>
+    </Component>
+    <Component class="model.Song" name="song1">
+    </Component>
+    <Component class="javax.persistence.Query" name="query3">
+      <Properties>
+        <Property name="query" type="java.lang.String" value=""/>
+        <Property name="entityManager" type="java.lang.Object" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="em" type="code"/>
+        </Property>
+      </Properties>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="em.createQuery(&quot;SELECT s FROM Song s JOIN s.albumId albumsongs WHERE albumsongs = :al&quot;).setParameter(&quot;al&quot;, a)"/>
+      </AuxValues>
+    </Component>
+    <Component class="java.util.List" name="slist1">
+      <Properties>
+        <Property name="query" type="java.lang.Object" editor="org.netbeans.modules.form.j2ee.J2EEPropertyModifier$QueryBeanProperty$QueryEditor">
+          <ComponentRef name="query3"/>
+        </Property>
+        <Property name="observable" type="boolean" value="true"/>
+      </Properties>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;Song&gt;"/>
       </AuxValues>
     </Component>
   </NonVisualComponents>
@@ -296,16 +323,16 @@
               <Properties>
                 <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
                   <Table columnCount="3" rowCount="0">
-                    <Column editable="true" title="&#x3a4;&#x3af;&#x3c4;&#x3bb;&#x3bf;&#x3c2;" type="java.lang.String"/>
-                    <Column editable="true" title="&#x394;&#x3b9;&#x3ac;&#x3c1;&#x3ba;&#x3b5;&#x3b9;&#x3b1;" type="java.lang.Integer"/>
-                    <Column editable="true" title="&#x391;&#x3c1;&#x3b9;&#x3b8;&#x3bc;&#x3cc;&#x3c2;" type="java.lang.Integer"/>
+                    <Column editable="true" title="Title 1" type="java.lang.String"/>
+                    <Column editable="true" title="Title 2" type="java.lang.Integer"/>
+                    <Column editable="true" title="Title 3" type="java.lang.Integer"/>
                   </Table>
                 </Property>
                 <Property name="toolTipText" type="java.lang.String" value=""/>
                 <Property name="autoResizeMode" type="int" value="0"/>
                 <Property name="cellSelectionEnabled" type="boolean" value="true"/>
                 <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor" postCode="jTable1.getColumnModel().getColumn(0).setPreferredWidth(140);&#xa;jTable1.getColumnModel().getColumn(1).setPreferredWidth(101);&#xa;jTable1.getColumnModel().getColumn(2).setPreferredWidth(80);">
-                  <TableColumnModel selectionModel="0">
+                  <TableColumnModel selectionModel="1">
                     <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                       <Title/>
                       <Editor/>
@@ -424,7 +451,7 @@
       </AccessibilityProperties>
       <BindingProperties>
         <BindingProperty name="elements" source="list2" target="jComboBox3" targetPath="elements" updateStrategy="0" immediately="false"/>
-        <BindingProperty name="selectedItem" source="album1" sourcePath="${musicproductioncompanycompanyId.companyId}" target="jComboBox3" targetPath="selectedItem" updateStrategy="0" immediately="false"/>
+        <BindingProperty name="selectedItem" source="album1" sourcePath="${musicproductioncompanycompanyId}" target="jComboBox3" targetPath="selectedItem" updateStrategy="0" immediately="false"/>
       </BindingProperties>
     </Component>
   </SubComponents>

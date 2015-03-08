@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import model.Artist;
 import model.DBManager;
@@ -52,7 +53,7 @@ public class availableArtists extends javax.swing.JFrame {
         bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
         musicgroup2 = musicgroup1;
-        artistQuery = em.createQuery("SELECT a FROM Artist a WHERE a NOT IN (SELECT a FROM Artist a JOIN a.musicgroupList musicgroup WHERE musicgroup = :mg)").setParameter("mg", musicgroup2);
+        artistQuery = em.createQuery("SELECT a FROM Artist a WHERE a NOT IN (SELECT a FROM Artist a JOIN a.musicgroupList musicgroup WHERE musicgroup = :mg) ORDER BY a.lastname").setParameter("mg", musicgroup2);
         artistList = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : org.jdesktop.observablecollections.ObservableCollections.observableList(artistQuery.getResultList());
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -150,9 +151,16 @@ public class availableArtists extends javax.swing.JFrame {
         int[] sr = jTable1.getSelectedRows();
         for (int i : sr){
             a = artistList.get(i);
-            this.gmf.model.addRow(new Object[]{a.getLastname(),a.getFirstname(),a.getArtisticname(),sdf.format(a.getBirthday())});
-            selArtists.add(a);
-            gmf.artistsList.add(a);
+            if(selArtists.contains(a)){
+                JOptionPane.showMessageDialog(this, "Ο καλλιτέχνης " + a.getLastname() + " " + a.getFirstname() + " υπάρχει ήδη στο συγκρότημα.", "Λάθος στην εισαγωγή", JOptionPane.WARNING_MESSAGE);
+            }else{
+                this.gmf.model.addRow(new Object[]{a.getLastname(),a.getFirstname(),a.getArtisticname(),sdf.format(a.getBirthday())});
+                selArtists.add(a);
+                gmf.artistsList.add(a);
+                //for (Artist a : selArtists){
+                //    System.out.println("Selected Artist Name: " + a.getLastname());
+                //}
+            }
         }
         closeMe(true);
     }//GEN-LAST:event_jButton1ActionPerformed

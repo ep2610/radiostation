@@ -374,9 +374,9 @@ public class groupsManagementForm extends javax.swing.JFrame {
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         s = jTable1.getSelectedRow();
         Artist a = list1.get(s);
-        System.out.println("Artist Name: " + a.getLastname());
         model.removeRow(s);
         artistsList.remove(a);
+        checkControls();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked

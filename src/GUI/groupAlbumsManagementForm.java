@@ -9,12 +9,17 @@ import com.sun.glass.events.KeyEvent;
 import static com.sun.xml.internal.fastinfoset.alphabet.BuiltInRestrictedAlphabets.table;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import model.Album;
+import model.Artist;
 import model.DBManager;
 import model.Musicgroup;
 import model.Song;
@@ -24,23 +29,63 @@ import model.Song;
  */
 public class groupAlbumsManagementForm extends javax.swing.JFrame {
 JTable table;
-DefaultTableModel model;
-int x = 0;
-int s;
 private EntityManager em;
-Song Song1;
+SimpleDateFormat sdf = new SimpleDateFormat("mm:ss");
+Album a;
 List<Song> songList;
+List<Musicgroup> musicgroupList;
+DefaultTableModel model;
+int s;
+Boolean newpressed;
+Calendar c = Calendar.getInstance();
+int x = 0;
 
-    public groupAlbumsManagementForm() {
+
+    public groupAlbumsManagementForm(Album al, Boolean newspressed) {
         //System.out.println("Point1");
         em = DBManager.em;
+        a = al;
+        this.newpressed = newpressed;
         initComponents();
-        //Song1 = so;
+        songList = slist1;
         model = getjTable1Model();
         
+        setJTable(jTable1, slist1);
+        
+        // Γεμίζει ανάλογα τα πεδία στο GUI
+        if (!(a.getTitle().isEmpty())) {
+            jTextField1.setText(a.getTitle());
+            jComboBox1.setSelectedItem(a.getType());
+            jComboBox3.setSelectedItem(a.getMusicproductioncompanycompanyId());
+            jTextField3.setText(a.getDisknumber().toString());
+            jComboBox2.setSelectedItem(a.getMusicgroupList());
+            jDateChooser1.setDate(a.getReleasedate());
+        }
         
     checkControls();
     }
+    public void setJTable(javax.swing.JTable jTable, List<Song> obj) {
+       //Long tmpGroupId;
+        //Long tmpArtistId;
+        //String tmpName ="";
+        
+                
+        for (Song so : obj) {
+            model.addRow(new Object[]{so.getTitle(), sdf.format(so.getDuration()),so.getTracknr()});
+            
+        System.out.println(so.getTitle());
+            //if(s.getAlbumId().getMusicgroupList().size() > 0){
+              //  tmpGroupId = s.getAlbumId().getMusicgroupList().get(0).getGroupId();
+                //TypedQuery<Musicgroup> musicgroupQuery = em.createQuery("SELECT m FROM Musicgroup m WHERE m.groupId = :groupId", Musicgroup.class).setParameter("groupId", tmpGroupId);
+                //Musicgroup g = musicgroupQuery.getSingleResult();
+                //tmpName = g.getName();
+           //}
+            
+            //Τοποθετεί στον πίνακα τις πληροφορίες των τραγουδιών
+            
+       
+        }
+     }
      /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -51,13 +96,16 @@ List<Song> songList;
     private void initComponents() {
         bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
-        album1 = new model.Album();
+        album1 = a;
         musicProdCompRenderer1 = new GUI.musicProdCompRenderer();
         query2 = java.beans.Beans.isDesignTime() ? null : em.createQuery("SELECT mp FROM Musicproductioncompany mp");
         list2 = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : query2.getResultList();
         musicGroupRenderer1 = new GUI.musicGroupRenderer();
         query1 = java.beans.Beans.isDesignTime() ? null : em.createQuery("SELECT m FROM Musicgroup m");
         list1 = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : query1.getResultList();
+        song1 = new model.Song();
+        query3 = em.createQuery("SELECT s FROM Song s JOIN s.albumId albumsongs WHERE albumsongs = :al").setParameter("al", a);
+        slist1 = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : org.jdesktop.observablecollections.ObservableCollections.observableList(query3.getResultList());
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -135,7 +183,7 @@ List<Song> songList;
 
             },
             new String [] {
-                "Τίτλος", "Διάρκεια", "Αριθμός"
+                "Title 1", "Title 2", "Title 3"
             }
         ) {
             Class[] types = new Class [] {
@@ -157,6 +205,7 @@ List<Song> songList;
             }
         });
         jScrollPane1.setViewportView(jTable1);
+        jTable1.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jTable1.getColumnModel().getColumn(0).setPreferredWidth(140);
         jTable1.getColumnModel().getColumn(1).setPreferredWidth(101);
         jTable1.getColumnModel().getColumn(2).setPreferredWidth(80);
@@ -248,7 +297,7 @@ List<Song> songList;
 
         jComboBoxBinding = org.jdesktop.swingbinding.SwingBindings.createJComboBoxBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, list2, jComboBox3);
         bindingGroup.addBinding(jComboBoxBinding);
-        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, album1, org.jdesktop.beansbinding.ELProperty.create("${musicproductioncompanycompanyId.companyId}"), jComboBox3, org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, album1, org.jdesktop.beansbinding.ELProperty.create("${musicproductioncompanycompanyId}"), jComboBox3, org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
         bindingGroup.addBinding(binding);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -375,14 +424,18 @@ List<Song> songList;
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         Musicgroup mg = new Musicgroup();
         List <Musicgroup> listM = new ArrayList();
-        //listM.add((Musicgroup)jComboBox2.getItemAt(jComboBox2.getSelectedIndex()));
-        mg = ((Musicgroup)jComboBox2.getItemAt(jComboBox2.getSelectedIndex()));
-        System.out.println(mg.getName());
+        listM.add((Musicgroup)jComboBox2.getItemAt(jComboBox2.getSelectedIndex()));
+        Song so = new Song();
+        List<Song> listS = new ArrayList();
+        album1.setSongList(listS);
+        album1.setMusicgroupList(listM);
+        //mg = ((Musicgroup)jComboBox2.getItemAt(jComboBox2.getSelectedIndex()));
+        //System.out.println(mg.getName());
         
-        //album1.setMusicgroupList(listM);
+       
         //em.getTransaction().rollback();
         //em.getTransaction().begin();
-        //closeMe(true);
+        closeMe(true);
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
@@ -441,6 +494,9 @@ List<Song> songList;
     private GUI.musicProdCompRenderer musicProdCompRenderer1;
     private javax.persistence.Query query1;
     private javax.persistence.Query query2;
+    private javax.persistence.Query query3;
+    private java.util.List<Song> slist1;
+    private model.Song song1;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 

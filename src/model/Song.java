@@ -61,10 +61,11 @@ public class Song implements Serializable {
     @Basic(optional = false)
     @Column(name = "TRACKNR")
     private int tracknr;
-    @JoinTable(name = "PLAYLIST_SONG", joinColumns = {
-        @JoinColumn(name = "SONG_ID", referencedColumnName = "SONG_ID")}, inverseJoinColumns = {
-        @JoinColumn(name = "LIST_ID", referencedColumnName = "LIST_ID")})
-    @ManyToMany
+    //@JoinTable(name = "PLAYLIST_SONG", joinColumns = {
+    //    @JoinColumn(name = "SONG_ID", referencedColumnName = "SONG_ID")}, inverseJoinColumns = {
+    //    @JoinColumn(name = "LIST_ID", referencedColumnName = "LIST_ID")})
+    //@ManyToMany
+    @ManyToMany(mappedBy = "songList")
     private List<Playlist> playlistList;
     @JoinColumn(name = "ALBUM_ID", referencedColumnName = "ALBUM_ID")
     @ManyToOne(optional = false)

@@ -5,10 +5,14 @@
  */
 package GUI;
 
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import model.Artist;
 import model.DBManager;
@@ -22,9 +26,11 @@ import model.Song;
  */
 public class searchAndInsertSong extends javax.swing.JFrame {
     SimpleDateFormat sdf = new SimpleDateFormat("mm:ss");
-    private EntityManager em;
     private songListsManagementForm slmf;
+    private EntityManager em;
+    private List<Song> selSongs = new ArrayList();
     Playlist playlist1;
+    Song song;
     DefaultTableModel model;
     int s;
     
@@ -46,7 +52,6 @@ public class searchAndInsertSong extends javax.swing.JFrame {
     }
 
     private void setJTable(javax.swing.JTable jTable, List<Song> obj) {
-        //Μεταβλητές
         Long tmpGroupId;
         Long tmpArtistId;
         String tmpName ="";
@@ -54,14 +59,12 @@ public class searchAndInsertSong extends javax.swing.JFrame {
         for (Song s : obj) {
             if(s.getAlbumId().getMusicgroupList().size() > 0){
                 tmpGroupId = s.getAlbumId().getMusicgroupList().get(0).getGroupId();
-                System.out.println("Song Name: " + s.getTitle() + ", GroupID: " + tmpGroupId);
                 TypedQuery<Musicgroup> musicgroupQuery = em.createQuery("SELECT m FROM Musicgroup m WHERE m.groupId = :groupId", Musicgroup.class).setParameter("groupId", tmpGroupId);
                 Musicgroup g = musicgroupQuery.getSingleResult();
                 tmpName = g.getName();
             }
             else if(s.getAlbumId().getArtistList().size() > 0){
                 tmpArtistId = s.getAlbumId().getArtistList().get(0).getArtistId();
-                System.out.println("Song Name: " + s.getTitle() + ", ArtistID: " + tmpArtistId);
                 TypedQuery<Artist> artistQuery = em.createQuery("SELECT a FROM Artist a WHERE m.artistId = :artistId", Artist.class).setParameter("artistId", tmpArtistId);
                 Artist a = artistQuery.getSingleResult();
                 tmpName = (a.getLastname() + " " + a.getFirstname());
@@ -198,8 +201,18 @@ public class searchAndInsertSong extends javax.swing.JFrame {
         jButton2.setEnabled(s >= 0);
     }
     
+    private void closeMe(boolean exitAndSave) {
+        MyWindowEvent we = new MyWindowEvent(this, WindowEvent.WINDOW_CLOSED, exitAndSave);
+        for (WindowListener l : this.getWindowListeners()) {
+            l.windowClosed(we);
+        }
+        this.setVisible(false);
+    }
+    
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        this.dispose();
+        em.getTransaction().rollback();
+        em.getTransaction().begin();
+        closeMe(false);
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
@@ -207,7 +220,18 @@ public class searchAndInsertSong extends javax.swing.JFrame {
     }//GEN-LAST:event_jTable1MouseClicked
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
+        int[] sr = jTable1.getSelectedRows();
+        for (int i : sr) {
+            song = songList.get(i);
+            if(slmf.songList.contains(song)){
+                JOptionPane.showMessageDialog(this, "Το τραγούδι " + song.getTitle() + " υπάρχει ήδη στη λίστα.", "Λάθος στην εισαγωγή", JOptionPane.WARNING_MESSAGE);
+            }else{
+                selSongs.add(song);
+                slmf.songList.add(song);
+            }
+        }
+        slmf.setJTable(jTable1, selSongs);
+        closeMe(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     public DefaultTableModel getjTable1Model() {

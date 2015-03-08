@@ -221,6 +221,11 @@
       <Properties>
         <Property name="toolTipText" type="java.lang.String" value="&#x395;&#x3b9;&#x3c3;&#x3ac;&#x3b3;&#x3b5;&#x3c4;&#x3b5; &#x3c4;&#x3bf;&#x3bd; &#x3a4;&#x3af;&#x3c4;&#x3bb;&#x3bf; &#x3c4;&#x3bf;&#x3c5; &#x386;&#x3bb;&#x3bc;&#x3c0;&#x3bf;&#x3c5;&#x3bc;"/>
       </Properties>
+      <BindingProperties>
+        <BindingProperty name="text" source="album1" sourcePath="${title}" target="jTextField1" targetPath="text" updateStrategy="0" immediately="false">
+          <BindingParameter name="javax.swing.binding.ParameterKeys.TEXT_CHANGE_STRATEGY" value="javax.swing.binding.TextChangeStrategy.ON_TYPE"/>
+        </BindingProperty>
+      </BindingProperties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jTextField1ActionPerformed"/>
       </Events>
@@ -229,6 +234,11 @@
       <Properties>
         <Property name="toolTipText" type="java.lang.String" value="&#x395;&#x3b9;&#x3c3;&#x3ac;&#x3b3;&#x3b5;&#x3c4;&#x3b5; &#x3c4;&#x3bf;&#x3bd; &#x391;&#x3c1;&#x3b9;&#x3b8;&#x3bc;&#x3cc; &#x3c4;&#x3bf;&#x3c5; &#x386;&#x3bb;&#x3bc;&#x3c0;&#x3bf;&#x3c5;&#x3bc;"/>
       </Properties>
+      <BindingProperties>
+        <BindingProperty name="text" source="album1" sourcePath="${disknumber}" target="jTextField3" targetPath="text" updateStrategy="0" immediately="false">
+          <BindingParameter name="javax.swing.binding.ParameterKeys.TEXT_CHANGE_STRATEGY" value="javax.swing.binding.TextChangeStrategy.ON_TYPE"/>
+        </BindingProperty>
+      </BindingProperties>
       <Events>
         <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="jTextField3KeyTyped"/>
       </Events>
@@ -368,6 +378,9 @@
       <Properties>
         <Property name="toolTipText" type="java.lang.String" value="&#x395;&#x3c0;&#x3b9;&#x3bb;&#x3ad;&#x3be;&#x3c4;&#x3b5; &#x397;&#x3bc;&#x3b5;&#x3c1;&#x3bf;&#x3bc;&#x3b7;&#x3bd;&#x3af;&#x3b1; &#x39a;&#x3c5;&#x3ba;&#x3bb;&#x3bf;&#x3c6;&#x3bf;&#x3c1;&#x3af;&#x3b1;&#x3c2;"/>
       </Properties>
+      <BindingProperties>
+        <BindingProperty name="date" source="album1" sourcePath="${releasedate}" target="jDateChooser1" targetPath="date" updateStrategy="0" immediately="false"/>
+      </BindingProperties>
     </Component>
     <Component class="javax.swing.JComboBox" name="jComboBox1">
       <Properties>
@@ -381,6 +394,9 @@
         <Property name="selectedIndex" type="int" value="-1"/>
         <Property name="toolTipText" type="java.lang.String" value="&#x395;&#x3c0;&#x3b9;&#x3bb;&#x3ad;&#x3be;&#x3c4;&#x3b5; &#x3c4;&#x3bf;&#x3bd; &#x3a4;&#x3cd;&#x3c0;&#x3bf; &#x386;&#x3bb;&#x3bc;&#x3c0;&#x3bf;&#x3c5;&#x3bc;"/>
       </Properties>
+      <BindingProperties>
+        <BindingProperty name="selectedItem" source="album1" sourcePath="${type}" target="jComboBox1" targetPath="selectedItem" updateStrategy="0" immediately="false"/>
+      </BindingProperties>
     </Component>
     <Component class="javax.swing.JComboBox" name="jComboBox2">
       <Properties>
@@ -392,6 +408,9 @@
       <BindingProperties>
         <BindingProperty name="elements" source="list1" target="jComboBox2" targetPath="elements" updateStrategy="0" immediately="false"/>
       </BindingProperties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jComboBox2ActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JComboBox" name="jComboBox3">
       <Properties>

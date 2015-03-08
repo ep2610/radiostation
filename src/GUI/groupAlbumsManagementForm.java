@@ -9,6 +9,7 @@ import com.sun.glass.events.KeyEvent;
 import static com.sun.xml.internal.fastinfoset.alphabet.BuiltInRestrictedAlphabets.table;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.swing.JOptionPane;
@@ -106,6 +107,10 @@ List<Song> songList;
         jLabel8.setText("Λίστα τραγουδιών:");
 
         jTextField1.setToolTipText("Εισάγετε τον Τίτλο του Άλμπουμ");
+
+        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, album1, org.jdesktop.beansbinding.ELProperty.create("${title}"), jTextField1, org.jdesktop.beansbinding.BeanProperty.create("text"));
+        bindingGroup.addBinding(binding);
+
         jTextField1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextField1ActionPerformed(evt);
@@ -113,6 +118,10 @@ List<Song> songList;
         });
 
         jTextField3.setToolTipText("Εισάγετε τον Αριθμό του Άλμπουμ");
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, album1, org.jdesktop.beansbinding.ELProperty.create("${disknumber}"), jTextField3, org.jdesktop.beansbinding.BeanProperty.create("text"));
+        bindingGroup.addBinding(binding);
+
         jTextField3.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 jTextField3KeyTyped(evt);
@@ -212,9 +221,15 @@ List<Song> songList;
 
         jDateChooser1.setToolTipText("Επιλέξτε Ημερομηνία Κυκλοφορίας");
 
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, album1, org.jdesktop.beansbinding.ELProperty.create("${releasedate}"), jDateChooser1, org.jdesktop.beansbinding.BeanProperty.create("date"));
+        bindingGroup.addBinding(binding);
+
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "sc", "ep", "lp" }));
         jComboBox1.setSelectedIndex(-1);
         jComboBox1.setToolTipText("Επιλέξτε τον Τύπο Άλμπουμ");
+
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, album1, org.jdesktop.beansbinding.ELProperty.create("${type}"), jComboBox1, org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
+        bindingGroup.addBinding(binding);
 
         jComboBox2.setToolTipText("Επιλέξτε το Συγκρότημα");
         jComboBox2.setRenderer(musicGroupRenderer1);
@@ -222,12 +237,18 @@ List<Song> songList;
         org.jdesktop.swingbinding.JComboBoxBinding jComboBoxBinding = org.jdesktop.swingbinding.SwingBindings.createJComboBoxBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, list1, jComboBox2);
         bindingGroup.addBinding(jComboBoxBinding);
 
+        jComboBox2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox2ActionPerformed(evt);
+            }
+        });
+
         jComboBox3.setToolTipText("Επιλέξτε την Εταιρεία Παραγωγής");
         jComboBox3.setRenderer(musicProdCompRenderer1);
 
         jComboBoxBinding = org.jdesktop.swingbinding.SwingBindings.createJComboBoxBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, list2, jComboBox3);
         bindingGroup.addBinding(jComboBoxBinding);
-        org.jdesktop.beansbinding.Binding binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, album1, org.jdesktop.beansbinding.ELProperty.create("${musicproductioncompanycompanyId.companyId}"), jComboBox3, org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
+        binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, album1, org.jdesktop.beansbinding.ELProperty.create("${musicproductioncompanycompanyId.companyId}"), jComboBox3, org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
         bindingGroup.addBinding(binding);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -352,9 +373,16 @@ List<Song> songList;
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        em.getTransaction().rollback();
-        em.getTransaction().begin();
-        closeMe(false);
+        Musicgroup mg = new Musicgroup();
+        List <Musicgroup> listM = new ArrayList();
+        //listM.add((Musicgroup)jComboBox2.getItemAt(jComboBox2.getSelectedIndex()));
+        mg = ((Musicgroup)jComboBox2.getItemAt(jComboBox2.getSelectedIndex()));
+        System.out.println(mg.getName());
+        
+        //album1.setMusicgroupList(listM);
+        //em.getTransaction().rollback();
+        //em.getTransaction().begin();
+        //closeMe(true);
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
@@ -368,6 +396,10 @@ List<Song> songList;
          evt.consume();
         }
     }//GEN-LAST:event_jTextField3KeyTyped
+
+    private void jComboBox2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jComboBox2ActionPerformed
     private void closeMe(boolean exitAndSave) {
         MyWindowEvent we = new MyWindowEvent(this, WindowEvent.WINDOW_CLOSED, exitAndSave);
         for (WindowListener l : this.getWindowListeners()) {

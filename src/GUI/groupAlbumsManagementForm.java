@@ -30,7 +30,7 @@ Song Song1;
 List<Song> songList;
 
     public groupAlbumsManagementForm() {
-        System.out.println("Point1");
+        //System.out.println("Point1");
         em = DBManager.em;
         initComponents();
         //Song1 = so;
@@ -117,9 +117,17 @@ List<Song> songList;
 
             },
             new String [] {
-                "TITLE", "DURATION", "TRACKNR"
+                "Τίτλος", "Διάρκεια", "Αριθμός"
             }
-        ));
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+        });
         jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         jTable1.setCellSelectionEnabled(true);
         jTable1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
@@ -131,8 +139,8 @@ List<Song> songList;
         });
         jScrollPane1.setViewportView(jTable1);
         jTable1.getColumnModel().getColumn(0).setPreferredWidth(140);
-        jTable1.getColumnModel().getColumn(1).setPreferredWidth(80);
-        jTable1.getColumnModel().getColumn(2).setPreferredWidth(100);
+        jTable1.getColumnModel().getColumn(1).setPreferredWidth(101);
+        jTable1.getColumnModel().getColumn(2).setPreferredWidth(80);
 
         jButton1.setText("Εισαγωγή");
         jButton1.addActionListener(new java.awt.event.ActionListener() {

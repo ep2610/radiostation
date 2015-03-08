@@ -284,14 +284,14 @@
               <Properties>
                 <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
                   <Table columnCount="3" rowCount="0">
-                    <Column editable="true" title="TITLE" type="java.lang.Object"/>
-                    <Column editable="true" title="DURATION" type="java.lang.Object"/>
-                    <Column editable="true" title="TRACKNR" type="java.lang.Object"/>
+                    <Column editable="true" title="&#x3a4;&#x3af;&#x3c4;&#x3bb;&#x3bf;&#x3c2;" type="java.lang.String"/>
+                    <Column editable="true" title="&#x394;&#x3b9;&#x3ac;&#x3c1;&#x3ba;&#x3b5;&#x3b9;&#x3b1;" type="java.lang.Integer"/>
+                    <Column editable="true" title="&#x391;&#x3c1;&#x3b9;&#x3b8;&#x3bc;&#x3cc;&#x3c2;" type="java.lang.Integer"/>
                   </Table>
                 </Property>
                 <Property name="autoResizeMode" type="int" value="0"/>
                 <Property name="cellSelectionEnabled" type="boolean" value="true"/>
-                <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor" postCode="jTable1.getColumnModel().getColumn(0).setPreferredWidth(140);&#xa;jTable1.getColumnModel().getColumn(1).setPreferredWidth(80);&#xa;jTable1.getColumnModel().getColumn(2).setPreferredWidth(100);">
+                <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor" postCode="jTable1.getColumnModel().getColumn(0).setPreferredWidth(140);&#xa;jTable1.getColumnModel().getColumn(1).setPreferredWidth(101);&#xa;jTable1.getColumnModel().getColumn(2).setPreferredWidth(80);">
                   <TableColumnModel selectionModel="0">
                     <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                       <Title/>

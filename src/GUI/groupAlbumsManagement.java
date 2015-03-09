@@ -15,14 +15,15 @@ import javax.swing.table.DefaultTableModel;
 import model.*;
 import java.text.SimpleDateFormat;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 
 /**
  *
  * @author sotos
  */
 public class groupAlbumsManagement extends javax.swing.JFrame {
-   private EntityManager em;
-   int s;
+    private EntityManager em;
+    int s;
     Album al;
     SimpleDateFormat sdf = new SimpleDateFormat("d MMM yyyy");
     SimpleDateFormat stf = new SimpleDateFormat("mm:ss");
@@ -48,6 +49,7 @@ public class groupAlbumsManagement extends javax.swing.JFrame {
             new mainGUI().setVisible(true);
         }
         });
+        checkControls();
     }
     
     // Δημιουργία της λίστας των album
@@ -65,6 +67,7 @@ public class groupAlbumsManagement extends javax.swing.JFrame {
         }
        
     }
+    
     
     // Μέθοδος πρόσθεσης κατάλληλα διαμορφωμένων γραμμών στον πίνακα
     private void setJTable(javax.swing.JTable jTable, List<Album> obj) {
@@ -84,7 +87,12 @@ public class groupAlbumsManagement extends javax.swing.JFrame {
             model.addRow(new Object[]{a.getTitle(), a.getType(), a.getMusicproductioncompanycompanyId().getName(), a.getDisknumber(), tmpGroupName, sdf.format(a.getReleasedate())});
         }
      }
-
+    
+    private void checkControls() {
+        s = jTable1.getSelectedRow();
+        jButton2.setEnabled(s >= 0);
+        jButton3.setEnabled(s >= 0);
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -118,6 +126,11 @@ public class groupAlbumsManagement extends javax.swing.JFrame {
         });
 
         jButton2.setText("Διαγραφή");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         jButton3.setText("Μεταβολή");
         jButton3.addActionListener(new java.awt.event.ActionListener() {
@@ -158,6 +171,11 @@ public class groupAlbumsManagement extends javax.swing.JFrame {
         });
         jTable1.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
         jTable1.getTableHeader().setReorderingAllowed(false);
+        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable1MouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(jTable1);
         if (jTable1.getColumnModel().getColumnCount() > 0) {
             jTable1.getColumnModel().getColumn(0).setPreferredWidth(200);
@@ -215,8 +233,6 @@ public class groupAlbumsManagement extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        //groupAlbumsManagementForm gamf = new groupAlbumsManagementForm();
-        //gamf.setVisible(true);
         al = new Album();
         al.setTitle("");
         al.setType("");
@@ -226,8 +242,8 @@ public class groupAlbumsManagement extends javax.swing.JFrame {
         al.setReleasedate(null);
         al.setSongList(null);
         
-        
         newpressed = true;
+        
         groupAlbumsManagementForm gamf = new groupAlbumsManagementForm(al, newpressed);
         
         gamf.setVisible(true);
@@ -251,7 +267,7 @@ public class groupAlbumsManagement extends javax.swing.JFrame {
                     
                 }
                 thisframe.setEnabled(true);
-                //checkControls();
+                checkControls();
             }
             
             @Override
@@ -287,14 +303,12 @@ public class groupAlbumsManagement extends javax.swing.JFrame {
             }
             
         });
-        
-  
     }//GEN-LAST:event_jButton1ActionPerformed
+                   
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-         s = jTable1.getSelectedRow();
-         al = albumList1.get(s);
-        
+        s = jTable1.getSelectedRow();
+        al = albumList1.get(s);
         newpressed = false;
         
         groupAlbumsManagementForm gamf = new groupAlbumsManagementForm(al, newpressed);
@@ -320,15 +334,16 @@ public class groupAlbumsManagement extends javax.swing.JFrame {
                 else{
                     em.getTransaction().rollback();
                     em.getTransaction().begin();
-                    java.util.Collection data = em.createQuery("SELECT a FROM Album a", Album.class).getResultList();
-                    for (Object entity : data){
+                    //java.util.Collection data = em.createQuery("SELECT a FROM Album a", Album.class).getResultList();
+                    setalbumlist();
+                    for (Album entity : albumList1){
                     em.refresh(entity);
                     }
-                    albumList1.clear();
-                    albumList1.addAll(data);
+                    //albumList1.clear();
+                   //albumList1.addAll(data);
                 }
                 thisframe.setEnabled(true);
-                //checkControls();
+                checkControls();
             }
             
             @Override
@@ -362,13 +377,38 @@ public class groupAlbumsManagement extends javax.swing.JFrame {
                 System.out.println("Window Deactivated");
                 thisframe.setEnabled(true);
             }
-            
         });
-        
-
-// TODO add your handling code here:
     }//GEN-LAST:event_jButton3ActionPerformed
 
+    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
+        checkControls();
+    }//GEN-LAST:event_jTable1MouseClicked
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        s = jTable1.getSelectedRow();
+        al = albumList1.get(s);
+        Object[] options = {"Διαγραφή", "Ακύρωση"};
+        int n = JOptionPane.showOptionDialog(this, "Θέλετε να διαγράψετε το άλμπουμ " + al.getTitle(),
+                "Επιβεβαίωση Διαγραφής",
+                JOptionPane.OK_CANCEL_OPTION, 
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                options[1]);
+        
+        if(n == 0){
+            em.remove(al);
+            albumList1.remove(al);
+            em.getTransaction().commit();
+            em.getTransaction().begin();
+            
+            setalbumlist();
+            for (Album entity : albumList1){
+            em.refresh(entity);
+            }
+            checkControls();
+        }
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;

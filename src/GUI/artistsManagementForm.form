@@ -2,6 +2,11 @@
 
 <Form version="1.5" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JFrameFormInfo">
   <NonVisualComponents>
+    <Component class="model.Artist" name="artist2">
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="artist1"/>
+      </AuxValues>
+    </Component>
     <Component class="javax.persistence.Query" name="musicgenreQuery">
       <Properties>
         <Property name="query" type="java.lang.String" value="SELECT m FROM Musicgenre m"/>
@@ -25,15 +30,24 @@
         <Property name="text" type="java.lang.String" value="musicGenreRenderer1"/>
       </Properties>
     </Component>
-    <Component class="model.Artist" name="artist2">
-      <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="artist1"/>
-      </AuxValues>
-    </Component>
-    <Component class="javax.persistence.EntityManager" name="entityManager1">
+    <Component class="javax.persistence.Query" name="query1">
       <Properties>
-        <Property name="persistenceUnit" type="java.lang.String" value="pu"/>
+        <Property name="query" type="java.lang.String" value="SELECT a FROM Artist a"/>
+        <Property name="entityManager" type="java.lang.Object" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="em" type="code"/>
+        </Property>
       </Properties>
+    </Component>
+    <Component class="java.util.List" name="list1">
+      <Properties>
+        <Property name="query" type="java.lang.Object" editor="org.netbeans.modules.form.j2ee.J2EEPropertyModifier$QueryBeanProperty$QueryEditor">
+          <ComponentRef name="query1"/>
+        </Property>
+        <Property name="observable" type="boolean" value="true"/>
+      </Properties>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;Artist&gt;"/>
+      </AuxValues>
     </Component>
   </NonVisualComponents>
   <Properties>
@@ -251,14 +265,10 @@
           </StringArray>
         </Property>
         <Property name="selectedIndex" type="int" value="-1"/>
-        <Property name="toolTipText" type="java.lang.String" value=""/>
       </Properties>
       <BindingProperties>
         <BindingProperty name="selectedItem" source="artist2" sourcePath="${sex}" target="jComboBox1" targetPath="selectedItem" updateStrategy="0" immediately="false"/>
       </BindingProperties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jComboBox1ActionPerformed"/>
-      </Events>
     </Component>
     <Component class="javax.swing.JComboBox" name="jComboBox2">
       <Properties>

@@ -295,15 +295,6 @@ public class groupsManagementForm extends javax.swing.JFrame {
         ava.addWindowListener(new WindowListener() {
             @Override
             public void windowClosed(WindowEvent arg0) {
-                //if (MyWindowEvent.isExitAndSave(arg0)) {
-                    //em.persist(m);
-                    //musicgroupList.add(m);
-                    //int row = musicgroupList.size() - 1;
-                    //jTable1.setRowSelectionInterval(row, row);
-                    //jTable1.scrollRectToVisible(jTable1.getCellRect(row, 0, true));
-                    //em.getTransaction().commit();
-                    //em.getTransaction().begin();
-                //}
                 thisframe.setEnabled(true);
                 checkControls();
             }

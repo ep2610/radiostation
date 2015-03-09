@@ -29,6 +29,7 @@ public class searchAndInsertSong extends javax.swing.JFrame {
     private songListsManagementForm slmf;
     private EntityManager em;
     private List<Song> selSongs = new ArrayList();
+    private List<Song> refinedSongs = new ArrayList();
     Playlist playlist1;
     Song song;
     DefaultTableModel model;
@@ -103,6 +104,11 @@ public class searchAndInsertSong extends javax.swing.JFrame {
         jLabel1.setText("Αναζήτηση και Εισαγωγή Τραγουδιών");
 
         jButton1.setText("Αναζήτηση");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jLabel2.setFont(new java.awt.Font("Comic Sans MS", 0, 11)); // NOI18N
         jLabel2.setText("Διαθέσιμα Τραγούδια");
@@ -234,10 +240,56 @@ public class searchAndInsertSong extends javax.swing.JFrame {
         closeMe(true);
     }//GEN-LAST:event_jButton2ActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        Long tmpGroupId;
+        Long tmpArtistId;
+        String tmpName ="";
+        //refinedSongs.clear();
+        List<Song> orisongList = new ArrayList();
+        for(Song s : songList){
+            orisongList.add(s);
+        }
+        songList.clear();
+        
+        String searchCriteria = jTextField1.getText().trim();
+        System.out.println("Search Criteria = " + searchCriteria);
+        
+        for(Song s : orisongList){
+            if(s.getAlbumId().getMusicgroupList().size() > 0){
+                tmpGroupId = s.getAlbumId().getMusicgroupList().get(0).getGroupId();
+                TypedQuery<Musicgroup> musicgroupQuery = em.createQuery("SELECT m FROM Musicgroup m WHERE m.groupId = :groupId", Musicgroup.class).setParameter("groupId", tmpGroupId);
+                Musicgroup g = musicgroupQuery.getSingleResult();
+                if(s.getTitle().contains(searchCriteria) || g.getName().contains(searchCriteria)){
+                    //System.out.println("Song Title: " + s.getTitle() + ", of musicgroup: " + g.getName());
+                    //refinedSongs.add(s);
+                    songList.add(s);
+                }
+            }
+            else if(s.getAlbumId().getArtistList().size() > 0){
+                tmpArtistId = s.getAlbumId().getArtistList().get(0).getArtistId();
+                TypedQuery<Artist> artistQuery = em.createQuery("SELECT a FROM Artist a WHERE m.artistId = :artistId", Artist.class).setParameter("artistId", tmpArtistId);
+                Artist a = artistQuery.getSingleResult();
+                if(s.getTitle().contains(searchCriteria) || a.getLastname().contains(searchCriteria) || a.getFirstname().contains(searchCriteria)){
+                    //System.out.println("Song Title: " + s.getTitle() + ", of artist: " + a.getLastname() + " " + a.getFirstname());
+                    //refinedSongs.add(s);
+                    songList.add(s);
+                }
+            }
+        }
+        for(Song s : songList){
+            System.out.println("Song Title: " + s.getTitle());
+        }
+        //model.setRowCount(0);
+        //setJTable(jTable1, refinedSongs);
+        model.getDataVector().removeAllElements();
+        model.fireTableDataChanged(); // notifies the JTable that the model has changed
+        setJTable(jTable1, songList);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     public DefaultTableModel getjTable1Model() {
         return (DefaultTableModel)jTable1.getModel();
     }
-
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;

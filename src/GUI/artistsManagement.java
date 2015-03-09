@@ -22,6 +22,7 @@ public class artistsManagement extends javax.swing.JFrame {
     Artist a;
     int s;
     JFrame thisframe;
+    Boolean newpressed;
     
     /**
      * Creates new form artistsManagement
@@ -60,7 +61,7 @@ public class artistsManagement extends javax.swing.JFrame {
     private void initComponents() {
         bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
-        artistQuery = java.beans.Beans.isDesignTime() ? null : em.createQuery("SELECT a FROM Artist a");
+        artistQuery = java.beans.Beans.isDesignTime() ? null : em.createQuery("SELECT a FROM Artist a ORDER BY a.lastname");
         artistList = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : org.jdesktop.observablecollections.ObservableCollections.observableList(artistQuery.getResultList());
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
@@ -106,6 +107,7 @@ public class artistsManagement extends javax.swing.JFrame {
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/artist_32_32.png"))); // NOI18N
         jLabel1.setText("Καλλιτέχνες");
 
+        jTable1.setFocusable(false);
         jTable1.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jTable1.getTableHeader().setReorderingAllowed(false);
 
@@ -131,7 +133,7 @@ public class artistsManagement extends javax.swing.JFrame {
         columnBinding.setColumnClass(java.util.Date.class);
         columnBinding.setEditable(false);
         columnBinding = jTableBinding.addColumnBinding(org.jdesktop.beansbinding.ELProperty.create("${birthplace}"));
-        columnBinding.setColumnName("Birthplace");
+        columnBinding.setColumnName("Τόπος γέννησης");
         columnBinding.setColumnClass(String.class);
         columnBinding.setEditable(false);
         columnBinding = jTableBinding.addColumnBinding(org.jdesktop.beansbinding.ELProperty.create("${musicgenregenreId.name}"));
@@ -214,7 +216,8 @@ public class artistsManagement extends javax.swing.JFrame {
         a.setBirthplace("");
         a.setMusicgenregenreId(null);
 
-        artistsManagementForm amf = new artistsManagementForm(a);
+        newpressed = true;
+        artistsManagementForm amf = new artistsManagementForm(a, newpressed);
         
         amf.setVisible(true);
         JFrame thisframe = this;
@@ -300,7 +303,8 @@ public class artistsManagement extends javax.swing.JFrame {
         s = jTable1.getSelectedRow();
         a = artistList.get(s);
 
-        artistsManagementForm amf = new artistsManagementForm(a);
+        newpressed = false;
+        artistsManagementForm amf = new artistsManagementForm(a, newpressed);
         
         amf.setVisible(true);
         thisframe = this;

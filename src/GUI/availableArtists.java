@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.swing.JOptionPane;
-import javax.swing.table.DefaultTableModel;
 import model.Artist;
 import model.DBManager;
 import model.Musicgroup;
@@ -157,9 +156,6 @@ public class availableArtists extends javax.swing.JFrame {
                 this.gmf.model.addRow(new Object[]{a.getLastname(),a.getFirstname(),a.getArtisticname(),sdf.format(a.getBirthday())});
                 selArtists.add(a);
                 gmf.artistsList.add(a);
-                //for (Artist a : selArtists){
-                //    System.out.println("Selected Artist Name: " + a.getLastname());
-                //}
             }
         }
         closeMe(true);

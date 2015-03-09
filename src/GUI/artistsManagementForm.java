@@ -21,14 +21,16 @@ import model.Musicgenre;
 public class artistsManagementForm extends javax.swing.JFrame {
     private EntityManager em;
     Artist artist1;
+    Boolean newpressed;
     
     /**
      * Creates new form artistsManagementForm
      */
-    public artistsManagementForm(Artist a) {
+    public artistsManagementForm(Artist a, Boolean newpressed) {
         em = DBManager.em;
         artist1 = a;
-
+        this.newpressed = newpressed;
+        
         initComponents();
         if (!(artist1.getLastname().isEmpty())) {
             jTextField1.setText(artist1.getLastname());
@@ -51,11 +53,12 @@ public class artistsManagementForm extends javax.swing.JFrame {
     private void initComponents() {
         bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
+        artist2 = artist1;
         musicgenreQuery = java.beans.Beans.isDesignTime() ? null : em.createQuery("SELECT m FROM Musicgenre m");
         musicgenreList = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : musicgenreQuery.getResultList();
         musicGenreRenderer1 = new GUI.musicGenreRenderer();
-        artist2 = artist1;
-        entityManager1 = java.beans.Beans.isDesignTime() ? null : javax.persistence.Persistence.createEntityManagerFactory("RadioStationPU").createEntityManager();
+        query1 = java.beans.Beans.isDesignTime() ? null : em.createQuery("SELECT a FROM Artist a");
+        list1 = java.beans.Beans.isDesignTime() ? java.util.Collections.emptyList() : org.jdesktop.observablecollections.ObservableCollections.observableList(query1.getResultList());
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -125,16 +128,9 @@ public class artistsManagementForm extends javax.swing.JFrame {
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Male", "Female" }));
         jComboBox1.setSelectedIndex(-1);
-        jComboBox1.setToolTipText("");
 
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, artist2, org.jdesktop.beansbinding.ELProperty.create("${sex}"), jComboBox1, org.jdesktop.beansbinding.BeanProperty.create("selectedItem"));
         bindingGroup.addBinding(binding);
-
-        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBox1ActionPerformed(evt);
-            }
-        });
 
         jComboBox2.setRenderer(musicGenreRenderer1);
 
@@ -244,30 +240,38 @@ public class artistsManagementForm extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        Artist a = new Artist();
-        if (!(jTextField1.getText().isEmpty()) && !(jTextField2.getText().isEmpty()) && !(jTextField6.getText().isEmpty()) && !(jComboBox1.getSelectedIndex() == -1) &&!(jComboBox2.getSelectedIndex() == -1) && !(jDateChooser1.getDate() == null) ){
-            a.setLastname(jTextField1.getText());
-            a.setFirstname(jTextField2.getText());
-            a.setArtisticname(jTextField3.getText());
-            a.setSex((String)jComboBox1.getSelectedItem());
-            a.setBirthday(jDateChooser1.getDate());
-            a.setBirthplace(jTextField6.getText());
-            a.setMusicgenregenreId((Musicgenre) jComboBox2.getSelectedItem());
-            closeMe(true);
+        Boolean notexists = true;
+        // Έλεγχος εάν πρόκειται για εισαγωγή νέου καλλιτέχνη
+        if(newpressed){
+            for(Artist a : list1){
+                if(a.getLastname().equals(artist2.getLastname()) && a.getFirstname().equals(artist2.getFirstname())) notexists = false;
+            }
         }
-        else {
-            JOptionPane.showMessageDialog(this, "Όλα τα πεδία (πλην του πεδίου 'Καλλιτεχνικό Όνομα') πρέπει να είναι συμπληρωμένα.\nΠαρακαλώ διορθώστε ή πατήστε ακύρωση.", "Λάθος στην εισαγωγή", JOptionPane.WARNING_MESSAGE);
+        // Έλεγχος εάν υπάρχει ήδη το όνομα καλλιτέχνη
+        if (notexists){
+            Artist a = new Artist();
+            if (!(jTextField1.getText().isEmpty()) && !(jTextField2.getText().isEmpty()) && !(jTextField6.getText().isEmpty()) && !(jComboBox1.getSelectedIndex() == -1) &&!(jComboBox2.getSelectedIndex() == -1) && !(jDateChooser1.getDate() == null) ){
+                a.setLastname(jTextField1.getText());
+                a.setFirstname(jTextField2.getText());
+                a.setArtisticname(jTextField3.getText());
+                a.setSex((String)jComboBox1.getSelectedItem());
+                a.setBirthday(jDateChooser1.getDate());
+                a.setBirthplace(jTextField6.getText());
+                a.setMusicgenregenreId((Musicgenre) jComboBox2.getSelectedItem());
+                closeMe(true);
+            }
+            else {
+                JOptionPane.showMessageDialog(this, "Όλα τα πεδία (πλην του πεδίου 'Καλλιτεχνικό Όνομα') πρέπει να είναι συμπληρωμένα.\nΠαρακαλώ διορθώστε ή πατήστε ακύρωση.", "Λάθος στην εισαγωγή", JOptionPane.WARNING_MESSAGE);
+            }
+        }
+        else{
+            JOptionPane.showMessageDialog(this, "Ο καλλιτέχνης με το όνομα: " + artist2.getLastname() + " " + artist2.getFirstname() + " υπάρχει ήδη.\nΠαρακαλώ διορθώστε ή πατήστε ακύρωση.", "Λάθος στην εισαγωγή", JOptionPane.WARNING_MESSAGE);
         }
     }//GEN-LAST:event_jButton2ActionPerformed
-
-    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jComboBox1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private model.Artist artist2;
-    private javax.persistence.EntityManager entityManager1;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JComboBox jComboBox1;
@@ -285,9 +289,11 @@ public class artistsManagementForm extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField2;
     private javax.swing.JTextField jTextField3;
     private javax.swing.JTextField jTextField6;
+    private java.util.List<Artist> list1;
     private GUI.musicGenreRenderer musicGenreRenderer1;
     private java.util.List<model.Musicgenre> musicgenreList;
     private javax.persistence.Query musicgenreQuery;
+    private javax.persistence.Query query1;
     private org.jdesktop.beansbinding.BindingGroup bindingGroup;
     // End of variables declaration//GEN-END:variables
 }

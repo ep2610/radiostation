@@ -10,7 +10,6 @@ import java.awt.event.WindowListener;
 import javax.persistence.EntityManager;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import model.Artist;
 import model.DBManager;
 import model.Musicgroup;
 

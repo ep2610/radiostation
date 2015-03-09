@@ -312,8 +312,9 @@ public class groupAlbumsManagement extends javax.swing.JFrame {
                     albumList1.set(s, al);
                     em.getTransaction().commit();
                     em.getTransaction().begin();
-                   
-                    //setJTable(jTable1, albumList1);
+                    model.getDataVector().removeAllElements();
+                    model.fireTableDataChanged(); // notifies the JTable that the model has changed
+                    setJTable(jTable1, albumList1);
                     
                 }
                 else{

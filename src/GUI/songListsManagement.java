@@ -8,6 +8,7 @@ package GUI;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,6 +36,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  *
@@ -388,6 +390,7 @@ public class songListsManagement extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        Boolean notexists = true;
         jFileChooser1.setDialogTitle("Εισαγωγή Λίστας από XML");
         
         // Επιλογή xml αρχείου με τη βοήθεια ενός JFileChooser
@@ -399,44 +402,62 @@ public class songListsManagement extends javax.swing.JFrame {
                 DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
                 Document doc = docBuilder.parse(file);
                 doc.getDocumentElement().normalize();
-                
+
                 Element playlistElement = doc.getDocumentElement();
                 
-                Playlist playlist = new Playlist();
-                playlist.setCreationdate(new Date());
-                playlist.setName(playlistElement.getAttribute("name"));
-                
-                NodeList nList = doc.getElementsByTagName("song");
-                
-                List<Song> songList = new ArrayList<>();
-                for (int i = 0; i < nList.getLength(); i++){
-                    Node nNode = nList.item(i);
-                    
-                    if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-                        Element eElement = (Element) nNode;
-
-                        int tmpId = Integer.parseInt(eElement.getElementsByTagName("songId").item(0).getTextContent());
-                        TypedQuery<Song> songQuery = em.createQuery("SELECT s FROM Song s WHERE s.songId = :songId", Song.class).setParameter("songId", tmpId);
-                        Song s = songQuery.getSingleResult();
-                        songList.add(s);
-                    }
+                // Έλεγχος ύπαρξης λίστας με το ίδιο όνομα
+                for(Playlist pl : playlistList){
+                    if(pl.getName().equals(playlistElement.getAttribute("name"))) notexists = false;
                 }
-                playlist.setSongList(songList);
-                
-                em.persist(playlist);
-                em.getTransaction().commit();
-                em.getTransaction().begin();
-                
-                JOptionPane.showMessageDialog(this, "Η εισαγωγή της λίστας έγινε με επιτυχία.", "Επιτυχής εισαγωγή", JOptionPane.WARNING_MESSAGE);
-                java.util.Collection data = playlistQuery.getResultList(); 
-                for (Object entity : data) { 
-                    em.refresh(entity); 
-                } 
-                playlistList.clear(); 
-                playlistList.addAll(data);
-            }catch (Exception e) {
-                //e.printStackTrace();
-                JOptionPane.showMessageDialog(this, "Η εισαγωγή της λίστας απέτυχε.", "Ανεπιτυχής εισαγωγή", JOptionPane.WARNING_MESSAGE);
+                // Εάν το όνομα δεν υπάρχει
+                if(notexists){
+                    Playlist playlist = new Playlist();
+                    playlist.setName(playlistElement.getAttribute("name"));
+                    playlist.setCreationdate(new Date());
+
+                    NodeList nList = doc.getElementsByTagName("song");
+
+                    List<Song> songList = new ArrayList<>();
+                    for (int i = 0; i < nList.getLength(); i++){
+                        Node nNode = nList.item(i);
+
+                        if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+                            Element eElement = (Element) nNode;
+                            try{
+                                int tmpId = Integer.parseInt(eElement.getElementsByTagName("songId").item(0).getTextContent());
+                                TypedQuery<Song> songQuery = em.createQuery("SELECT s FROM Song s WHERE s.songId = :songId", Song.class).setParameter("songId", tmpId);
+                                Song s = songQuery.getSingleResult();
+                                songList.add(s);
+                            }catch (NoResultException ex){
+                                JOptionPane.showMessageDialog(this, "Το τραγούδι: " + eElement.getElementsByTagName("title").item(0).getTextContent() + "\nδεν είναι διαθέσιμο.", "Λάθος σε τραγούδι", JOptionPane.WARNING_MESSAGE);
+                            }
+                        }
+                    }
+                    // Έλεγχος εάν η λίστα του xml αρχείου έχει έστω και ένα τραγούδι
+                    if(!songList.isEmpty()) {
+                        playlist.setSongList(songList);
+
+                        em.persist(playlist);
+                        em.getTransaction().commit();
+                        em.getTransaction().begin();
+
+                        JOptionPane.showMessageDialog(this, "Η εισαγωγή της λίστας έγινε με επιτυχία.", "Επιτυχής εισαγωγή", JOptionPane.WARNING_MESSAGE);
+                        java.util.Collection data = playlistQuery.getResultList(); 
+                        for (Object entity : data) { 
+                            em.refresh(entity); 
+                        } 
+                        playlistList.clear(); 
+                        playlistList.addAll(data);
+                    } else {
+                        em.getTransaction().rollback();
+                        em.getTransaction().begin();
+                        JOptionPane.showMessageDialog(this, "Απέτυχε η εισαγωγή της λίστας γιατί δεν έχει τραγούδια.", "Ανεπιτυχής εισαγωγή", JOptionPane.WARNING_MESSAGE);
+                    }
+                }else{
+                    JOptionPane.showMessageDialog(this, "Προσπάθεια εισαγωγής λίστας με όνομα: " + playlistElement.getAttribute("name") + "\nτο οποίο ήδη υπάρχει.", "Ανεπιτυχής εισαγωγή", JOptionPane.WARNING_MESSAGE);
+                }
+            }catch (ParserConfigurationException | SAXException | IOException ex) {
+                JOptionPane.showMessageDialog(this, "Δεν μπορεί να γίνει ανάγνωση του xml αρχείου.", "Ανεπιτυχής εισαγωγή", JOptionPane.WARNING_MESSAGE);
             }
         }
 

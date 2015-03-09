@@ -66,7 +66,7 @@ public class searchAndInsertSong extends javax.swing.JFrame {
             }
             else if(s.getAlbumId().getArtistList().size() > 0){
                 tmpArtistId = s.getAlbumId().getArtistList().get(0).getArtistId();
-                TypedQuery<Artist> artistQuery = em.createQuery("SELECT a FROM Artist a WHERE m.artistId = :artistId", Artist.class).setParameter("artistId", tmpArtistId);
+                TypedQuery<Artist> artistQuery = em.createQuery("SELECT a FROM Artist a WHERE a.artistId = :artistId", Artist.class).setParameter("artistId", tmpArtistId);
                 Artist a = artistQuery.getSingleResult();
                 tmpName = (a.getLastname() + " " + a.getFirstname());
             }
@@ -267,7 +267,7 @@ public class searchAndInsertSong extends javax.swing.JFrame {
             }
             else if(s.getAlbumId().getArtistList().size() > 0){
                 tmpArtistId = s.getAlbumId().getArtistList().get(0).getArtistId();
-                TypedQuery<Artist> artistQuery = em.createQuery("SELECT a FROM Artist a WHERE m.artistId = :artistId", Artist.class).setParameter("artistId", tmpArtistId);
+                TypedQuery<Artist> artistQuery = em.createQuery("SELECT a FROM Artist a WHERE a.artistId = :artistId", Artist.class).setParameter("artistId", tmpArtistId);
                 Artist a = artistQuery.getSingleResult();
                 if(s.getTitle().contains(searchCriteria) || a.getLastname().contains(searchCriteria) || a.getFirstname().contains(searchCriteria)){
                     //System.out.println("Song Title: " + s.getTitle() + ", of artist: " + a.getLastname() + " " + a.getFirstname());

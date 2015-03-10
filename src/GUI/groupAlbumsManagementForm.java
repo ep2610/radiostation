@@ -58,8 +58,9 @@ public class groupAlbumsManagementForm extends javax.swing.JFrame {
         checkControls();
     }
     public void setJTable(javax.swing.JTable jTable, List<Song> obj) {
-    
+        
         for (Song so : obj) {
+    
             model.addRow(new Object[]{so.getTitle(), sdf.format(so.getDuration()),so.getTracknr()});
             //System.out.println(so.getTitle());
         }
@@ -71,6 +72,78 @@ public class groupAlbumsManagementForm extends javax.swing.JFrame {
      private void checkControls() {
         s = jTable1.getSelectedRow();
         jButton2.setEnabled(s >= 0);
+    }
+     
+    private boolean checkEmptyFields(){
+         boolean ok;
+         ok = false;
+         
+        if (!(jTextField1.getText().isEmpty()) 
+                && !(jComboBox1.getSelectedIndex() == -1) 
+                && !(jComboBox3.getSelectedIndex() == -1) 
+                && !(jTextField3.getText().isEmpty())
+                && !(jComboBox2.getSelectedIndex() == -1)
+                && !(jDateChooser1.getDate() == null)
+                && !(jTable1.getRowCount() < 1)
+                && !(checkTableEmptyRows())
+                ){
+            ok = true; 
+        }
+         return ok;
+    }
+      
+    private boolean checkTableEmptyRows(){
+        boolean ok;
+            ok = true;   
+            if (jTable1.getCellEditor() != null) {
+                   jTable1.getCellEditor().stopCellEditing();
+               }
+            
+            if (!(jTable1.getRowCount()<1)){
+                
+                for(int i=0;i< jTable1.getRowCount();i++)
+                {
+                             String emr0 = jTable1.getValueAt(i, 0).toString();
+                            if (emr0.isEmpty()){
+                                ok = false;
+                                //System.out.println(i + 0 +"test");
+                            }
+                            Object emr1 = jTable1.getValueAt(i,1);
+                            if (emr1==null){
+                                ok = false;
+                                //System.out.println(i + "1" +"test");
+                            }
+                            Object emr2 = jTable1.getValueAt(i,2);
+                            if (emr2==null){
+                                ok = false;
+                                //System.out.println(i + "2" +"test");
+                            }
+                }
+            }
+        return ok; 
+    }
+    
+    private int timeInSeconds(Calendar c){
+        int hours = c.get(Calendar.HOUR_OF_DAY);
+        int minutes = c.get(Calendar.MINUTE);
+        int seconds = c.get(Calendar.SECOND);
+        int totalseconds = (hours * 3600) + (minutes * 60) + seconds;
+        return totalseconds;
+    }
+    
+    private Calendar secondsToTime(int totalseconds) {
+        Calendar c = Calendar.getInstance();
+        
+        int hours = totalseconds / 3600;
+        totalseconds = totalseconds % 3600;
+        int minutes = totalseconds / 60;
+        totalseconds = totalseconds % 60;
+        
+        c.set(Calendar.HOUR_OF_DAY, hours);
+        c.set(Calendar.MINUTE, minutes);
+        c.set(Calendar.SECOND, totalseconds);
+        
+        return c;
     }
      /**
      * This method is called from within the constructor to initialize the form.
@@ -129,14 +202,14 @@ public class groupAlbumsManagementForm extends javax.swing.JFrame {
 
         jLabel3.setText("Τύπος Άλμπουμ");
 
-        jLabel4.setText("Αριθμός άλμπουμ");
+        jLabel4.setText("Αριθμός 'Άλμπουμ");
 
-        jLabel5.setText("<html>Εταιρεία<Br> Παραγωγής</html>");
+        jLabel5.setText("Εταιρεία Παραγωγής");
 
         jLabel6.setText("Σγκρότημα");
 
         jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel7.setText("<html>Ημερομηνία <BR>Κυκλοφορίας</html>");
+        jLabel7.setText("Ημερομηνία Κυκλοφορίας");
         jLabel7.setVerticalTextPosition(javax.swing.SwingConstants.TOP);
 
         jLabel8.setText("Λίστα τραγουδιών:");
@@ -302,10 +375,10 @@ public class groupAlbumsManagementForm extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jLabel2)
                             .addComponent(jLabel3)
-                            .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel5)
                             .addComponent(jLabel4)
                             .addComponent(jLabel6)
-                            .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jLabel7))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -314,11 +387,10 @@ public class groupAlbumsManagementForm extends javax.swing.JFrame {
                             .addComponent(jDateChooser1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 47, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton4)
-                            .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 93, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(21, 21, 21)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 29, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
             .addGroup(layout.createSequentialGroup()
                 .addGap(10, 10, 10)
@@ -335,45 +407,42 @@ public class groupAlbumsManagementForm extends javax.swing.JFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addGap(16, 16, 16)
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton4))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton3)
+                    .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jComboBox3))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4)
+                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel6))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(16, 16, 16)
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel2)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel3)
-                            .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jLabel5)
-                            .addComponent(jComboBox3))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel4)
-                            .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jComboBox2, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
-                            .addComponent(jLabel6))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jDateChooser1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(45, 45, 45)
-                        .addComponent(jButton4)
-                        .addGap(18, 18, 18)
-                        .addComponent(jButton3)))
+                    .addComponent(jDateChooser1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(11, 11, 11)
                 .addComponent(jLabel8)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
+
+        layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jComboBox1, jComboBox2, jComboBox3, jDateChooser1, jTextField1, jTextField3});
 
         jComboBox3.getAccessibleContext().setAccessibleName("");
 
@@ -394,7 +463,7 @@ public class groupAlbumsManagementForm extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton3ActionPerformed
     
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        model.addRow(new java.util.Vector<String>(java.util.Arrays.asList(new String[]{"","",""})));
+        model.addRow(new Object[]{"",null,null});
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -408,14 +477,22 @@ public class groupAlbumsManagementForm extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        Musicgroup mg = new Musicgroup();
-            List <Musicgroup> listM = new ArrayList();
-            listM.add((Musicgroup)jComboBox2.getItemAt(jComboBox2.getSelectedIndex()));
-        Song so = new Song();
-            List<Song> listS = new ArrayList();
-            album1.setSongList(listS);
-            album1.setMusicgroupList(listM);
-        closeMe(true);
+        if (checkEmptyFields()){
+            
+            Musicgroup mg = new Musicgroup();
+                List <Musicgroup> listM = new ArrayList();
+                listM.add((Musicgroup)jComboBox2.getItemAt(jComboBox2.getSelectedIndex()));
+            Song so = new Song();
+                List<Song> listS = new ArrayList();
+                album1.setSongList(listS);
+                album1.setMusicgroupList(listM);
+            closeMe(true);
+            
+        
+        }else{
+        JOptionPane.showMessageDialog(this, "Παρακαλώ συμπληρώστε όλα τα πεδία.");    
+        }
+        
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
